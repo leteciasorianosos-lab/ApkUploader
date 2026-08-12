@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>DWR APK Manager v3.1</title>
+  <title>DWR APK Manager v3.2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
@@ -187,6 +187,7 @@
     }
     .toast.error { border-left-color: var(--danger); }
     .toast.success { border-left-color: var(--success); }
+    .toast.warning { border-left-color: var(--warning); }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -201,7 +202,7 @@
     .auth-overlay.hidden { display: none; opacity: 0; }
     .auth-box {
       background: var(--bg-secondary); padding: 2.5rem; border-radius: 48px;
-      max-width: 400px; width: 90%; border: 1px solid var(--border-color);
+      max-width: 420px; width: 90%; border: 1px solid var(--border-color);
       box-shadow: 0 24px 64px rgba(0,0,0,0.6);
     }
     .auth-box h2 { margin-bottom: 1.5rem; font-weight: 600; text-align: center; }
@@ -272,6 +273,26 @@
     }
     .protection-status.inactive {
       background: #2e1a1a; color: var(--danger); border: 1px solid var(--danger);
+    }
+    
+    /* Admin Reserved Dialog */
+    .admin-reserved-dialog {
+      background: #1a0f0f; border: 2px solid var(--danger);
+      border-radius: 16px; padding: 1.2rem 1.5rem;
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .admin-reserved-dialog .icon {
+      font-size: 2rem; flex-shrink: 0;
+    }
+    .admin-reserved-dialog .content {
+      flex: 1;
+    }
+    .admin-reserved-dialog .content h4 {
+      color: var(--danger); margin-bottom: 0.3rem;
+    }
+    .admin-reserved-dialog .content p {
+      color: var(--text-secondary); font-size: 0.9rem;
     }
     
     @media (max-width: 700px) {
@@ -372,6 +393,11 @@
       </div>
       
       <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
+        <h4>✅ Admin Username Reserved</h4>
+        <p style="color: var(--text-secondary); margin-top: 0.3rem;">The username "admin" is permanently reserved. Only the original admin can use this username.</p>
+      </div>
+      
+      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
         <h4>✅ Session Persistence</h4>
         <p style="color: var(--text-secondary); margin-top: 0.3rem;">Login state persists across page refreshes. Session expires after 24 hours of inactivity.</p>
       </div>
@@ -386,18 +412,13 @@
         <p style="color: var(--text-secondary); margin-top: 0.3rem;">5 failed login attempts max. Account locks temporarily after threshold.</p>
       </div>
       
-      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
-        <h4>✅ Code Obfuscation</h4>
-        <p style="color: var(--text-secondary); margin-top: 0.3rem;">Runtime code transformation, variable renaming, and control flow flattening.</p>
-      </div>
-      
       <div style="margin-top: 1.5rem; padding: 1rem; background: #0f1a2e; border-radius: 16px; border: 1px solid #1e3a5f;">
         <p style="color: #60a5fa; font-size: 0.9rem;">🔐 <strong>Security Status:</strong> All connections local. No remote servers used.</p>
         <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">
           <span class="security-badge">✅ Session Persistence</span>
           <span class="security-badge">✅ Anti-Dump Active</span>
+          <span class="security-badge">✅ Admin Reserved</span>
           <span class="security-badge">✅ No Tracking</span>
-          <span class="security-badge">✅ Client-Side Only</span>
         </p>
       </div>
     </div>
@@ -407,6 +428,16 @@
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box" id="authBox">
     <h2 id="authTitle">🔐 Login</h2>
+    
+    <!-- Admin Reserved Dialog -->
+    <div id="adminReservedDialog" class="admin-reserved-dialog hidden">
+      <div class="icon">⚠️</div>
+      <div class="content">
+        <h4>This User is Already Owned</h4>
+        <p>Make Your Own Account or Create a New Username</p>
+      </div>
+    </div>
+    
     <input type="text" id="authUser" placeholder="Username">
     <input type="password" id="authPass" placeholder="Password">
     <button class="btn btn-primary" id="authSubmit">Login</button>
@@ -420,6 +451,12 @@
 <script>
 (function() {
   'use strict';
+
+  // ============================================================
+  // RESERVED ADMIN USERNAME
+  // ============================================================
+  const RESERVED_ADMIN_USERNAME = 'admin';
+  const RESERVED_ADMIN_PASSWORD = 'admin123';
 
   // ============================================================
   // ENHANCED ANTI-DUMP PROTECTION SYSTEM
@@ -441,7 +478,6 @@
 
     initializeTriggers() {
       return {
-        // Enhanced environment detection
         detectTermux: () => {
           const ua = navigator.userAgent.toLowerCase();
           return ua.includes('termux') || ua.includes('com.termux') || 
@@ -459,12 +495,6 @@
           return patterns.some(p => ua.includes(p));
         },
         detectDevTools: () => {
-          const devtools = /./;
-          devtools.toString = () => {
-            this.triggerDefense();
-            return '';
-          };
-          // Check for devtools open
           const threshold = 160;
           const widthDiff = window.outerWidth - window.innerWidth;
           const heightDiff = window.outerHeight - window.innerHeight;
@@ -483,12 +513,7 @@
           }
           return false;
         },
-        detectAbnormalRequests: () => {
-          // Check for unusual API call patterns
-          return false;
-        },
         detectFunctionHooking: () => {
-          // Detect if core functions have been modified
           try {
             const originalToString = Function.prototype.toString;
             if (originalToString.length === 0) return true;
@@ -498,7 +523,6 @@
           }
         },
         detectConsoleInjection: () => {
-          // Check if console has been tampered with
           const methods = ['log', 'dir', 'table', 'group', 'groupEnd'];
           return methods.some(m => {
             try {
@@ -535,11 +559,10 @@
     createExpansionEngine() {
       return {
         generateExpandedData: function() {
-          const totalChunks = 1024; // 1GB target
-          const chunkSize = 1024 * 1024; // 1MB per chunk
+          const totalChunks = 1024;
+          const chunkSize = 1024 * 1024;
           let generated = 0;
           
-          // Generate multiple data streams
           const streams = ['console', 'dom', 'memory'];
           
           streams.forEach(stream => {
@@ -557,7 +580,6 @@
                   div.textContent = chunk;
                   document.body.appendChild(div);
                 } else if (stream === 'memory') {
-                  // Store in memory to prevent garbage collection
                   if (!window._protectionData) window._protectionData = [];
                   window._protectionData.push(chunk);
                 }
@@ -595,7 +617,6 @@
       
       console.warn(`⚠️ PROTECTION ACTIVATED - Defense Level ${this.defenseLevel}/${this.defenseMax}`);
       
-      // Activate defense mechanisms based on defense level
       const mechanisms = this.defenseMechanisms;
       
       if (this.defenseLevel >= 1) {
@@ -614,14 +635,12 @@
         mechanisms.activateDOMProtection();
       }
       
-      // Log detection
       this.detectionHistory.push({
         time: new Date().toISOString(),
         level: this.defenseLevel,
         triggers: this.getActiveTriggers()
       });
       
-      // If defense level is max, activate ultimate protection
       if (this.defenseLevel >= this.defenseMax) {
         this.activateUltimateProtection();
       }
@@ -643,25 +662,21 @@
     }
 
     obfuscateRuntimeCode() {
-      // Runtime code obfuscation
       const scripts = document.querySelectorAll('script');
       scripts.forEach(script => {
         if (script.textContent && script.textContent.length > 100) {
           const obfuscated = this.obfuscateString(script.textContent);
-          // Replace with obfuscated version
         }
       });
     }
 
     obfuscateString(str) {
-      // Simple string obfuscation
       return str.split('').map((c, i) => {
         return String.fromCharCode(c.charCodeAt(0) ^ (i % 256));
       }).join('');
     }
 
     protectMemorySpace() {
-      // Protect memory from inspection
       const memoryProtection = () => {
         if (performance && performance.memory) {
           Object.defineProperty(performance.memory, 'usedJSHeapSize', {
@@ -673,10 +688,8 @@
     }
 
     protectNetworkRequests() {
-      // Protect network requests
       const originalFetch = window.fetch;
       window.fetch = function() {
-        // Block suspicious requests
         if (arguments[0] && typeof arguments[0] === 'string') {
           if (arguments[0].includes('dump') || arguments[0].includes('scrape')) {
             return Promise.reject(new Error('Request blocked by protection'));
@@ -687,11 +700,9 @@
     }
 
     protectDOMStructure() {
-      // Protect DOM structure
       const originalQuerySelector = document.querySelector;
       document.querySelector = function() {
-        if (arguments[0] && arguments[0].includes('script') || 
-            arguments[0].includes('source')) {
+        if (arguments[0] && (arguments[0].includes('script') || arguments[0].includes('source'))) {
           return null;
         }
         return originalQuerySelector.apply(this, arguments);
@@ -701,13 +712,11 @@
     activateUltimateProtection() {
       console.warn('🔥 ULTIMATE PROTECTION ACTIVATED - MAXIMUM DEFENSE');
       
-      // Generate massive data output
       for (let i = 0; i < 10; i++) {
         setTimeout(() => {
           const megaChunk = this.dataExpansion.generateChunk(10 * 1024 * 1024);
           console.log('ULTIMATE_PROTECTION_DATA:', megaChunk);
           
-          // Create multiple DOM elements with data
           for (let j = 0; j < 100; j++) {
             const div = document.createElement('div');
             div.style.display = 'none';
@@ -717,7 +726,6 @@
         }, i * 100);
       }
       
-      // Prevent further inspection
       Object.defineProperty(window, '__DWR_PROTECTION', {
         get: function() { return null; }
       });
@@ -754,7 +762,6 @@
             catch(e) { return String(a); }
           }).join(' ');
           
-          // Check for source code dumping patterns
           if (argsStr.includes('SOURCE') || 
               argsStr.includes('CODE') || 
               argsStr.includes('DUMP') ||
@@ -767,7 +774,6 @@
             this.triggerDefense();
           }
           
-          // Call original with modified output for protection
           const modifiedArgs = args.map(arg => {
             if (typeof arg === 'string' && arg.length > 1000) {
               return '[PROTECTED: Data truncated]';
@@ -802,7 +808,7 @@
   const DB_VERSION = 1;
   const STORE_NAME = 'apks';
   const MAX_APK_SIZE = 50 * 1024 * 1024;
-  const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
+  const SESSION_TIMEOUT = 24 * 60 * 60 * 1000;
 
   let db = null;
   let state = {
@@ -882,16 +888,13 @@
       state.activity = JSON.parse(localStorage.getItem('dwr_activity')) || [];
       state.failedLoginAttempts = JSON.parse(localStorage.getItem('dwr_failed_logins')) || {};
       
-      // Load session
       const sessionData = JSON.parse(localStorage.getItem('dwr_session')) || null;
       if (sessionData) {
         state.currentUser = sessionData.user;
         state.sessionToken = sessionData.token;
         state.sessionExpiry = sessionData.expiry;
         
-        // Check if session is still valid
         if (state.sessionExpiry && Date.now() > state.sessionExpiry) {
-          // Session expired
           state.currentUser = null;
           state.sessionToken = null;
           state.sessionExpiry = null;
@@ -911,7 +914,6 @@
       localStorage.setItem('dwr_activity', JSON.stringify(state.activity));
       localStorage.setItem('dwr_failed_logins', JSON.stringify(state.failedLoginAttempts));
       
-      // Save session
       if (state.currentUser) {
         const sessionData = {
           user: state.currentUser,
@@ -936,10 +938,28 @@
   }
 
   // ============================================================
-  // AUTHENTICATION WITH SESSION
+  // AUTHENTICATION WITH ADMIN RESERVED CHECK
   // ============================================================
   
   function loginUser(username, password) {
+    // Check if trying to use reserved admin username with wrong password
+    if (username.toLowerCase() === RESERVED_ADMIN_USERNAME) {
+      const adminUser = state.users.find(u => u.username === RESERVED_ADMIN_USERNAME);
+      if (adminUser) {
+        if (adminUser.password !== password) {
+          // Show the admin reserved dialog
+          document.getElementById('adminReservedDialog').classList.remove('hidden');
+          toast('⚠️ This username is reserved for the admin owner.', 'warning');
+          return false;
+        }
+      } else {
+        // Admin account doesn't exist yet, but username is reserved
+        document.getElementById('adminReservedDialog').classList.remove('hidden');
+        toast('⚠️ This username is permanently reserved.', 'warning');
+        return false;
+      }
+    }
+
     const attempts = state.failedLoginAttempts[username] || 0;
     if (attempts >= 5) {
       toast('⚠️ Too many failed attempts. Please wait 5 minutes.', 'error');
@@ -953,6 +973,9 @@
       state.sessionExpiry = Date.now() + SESSION_TIMEOUT;
       delete state.failedLoginAttempts[username];
       saveState();
+      
+      // Hide admin reserved dialog if visible
+      document.getElementById('adminReservedDialog').classList.add('hidden');
       return true;
     } else {
       state.failedLoginAttempts[username] = (attempts || 0) + 1;
@@ -972,11 +995,22 @@
   }
 
   function registerUser(username, password) {
+    // Block registration of reserved admin username
+    if (username.toLowerCase() === RESERVED_ADMIN_USERNAME) {
+      document.getElementById('adminReservedDialog').classList.remove('hidden');
+      toast('⚠️ This username is permanently reserved and cannot be registered.', 'warning');
+      return false;
+    }
+
     if (state.users.find(u => u.username === username)) return false;
     if (password.length < 4) {
       toast('Password must be at least 4 characters', 'error');
       return false;
     }
+    
+    // Hide admin reserved dialog if visible
+    document.getElementById('adminReservedDialog').classList.add('hidden');
+    
     const isAdmin = state.users.length === 0;
     state.users.push({ username, password, admin: isAdmin, created: new Date().toISOString() });
     saveState();
@@ -1239,7 +1273,7 @@
       t.style.opacity = '0';
       t.style.transform = 'translateX(100px)';
       setTimeout(() => t.remove(), 300);
-    }, 3000);
+    }, 3500);
   }
 
   // ============================================================
@@ -1270,6 +1304,8 @@
       overlay.classList.add('hidden');
     } else {
       overlay.classList.remove('hidden');
+      // Hide admin reserved dialog when logging out
+      document.getElementById('adminReservedDialog').classList.add('hidden');
     }
     
     if (!isAdmin && document.getElementById('page-upload').classList.contains('active')) {
@@ -1318,6 +1354,9 @@
     document.getElementById('authTitle').innerText = isRegister ? '📝 Register' : '🔐 Login';
     this.innerText = isRegister ? 'Already have account? Login' : "Don't have account? Register";
     document.getElementById('authSubmit').innerText = isRegister ? 'Register' : 'Login';
+    
+    // Hide admin reserved dialog when toggling
+    document.getElementById('adminReservedDialog').classList.add('hidden');
   });
 
   document.getElementById('authSubmit').addEventListener('click', function() {
@@ -1334,8 +1373,9 @@
         document.getElementById('authSubmit').innerText = 'Login';
         document.getElementById('authUser').value = '';
         document.getElementById('authPass').value = '';
+        document.getElementById('adminReservedDialog').classList.add('hidden');
       } else {
-        toast('Username already exists or password too short', 'error');
+        toast('Registration failed', 'error');
       }
       return;
     }
@@ -1344,9 +1384,12 @@
       toast(`Welcome ${state.currentUser.username}`, 'success');
       saveState();
       renderAll();
+      document.getElementById('adminReservedDialog').classList.add('hidden');
     } else {
       const attempts = state.failedLoginAttempts[username] || 0;
-      toast(`Invalid credentials (${attempts}/5 attempts)`, 'error');
+      if (username.toLowerCase() !== RESERVED_ADMIN_USERNAME) {
+        toast(`Invalid credentials (${attempts}/5 attempts)`, 'error');
+      }
     }
   });
 
@@ -1560,35 +1603,29 @@
   // INITIALIZATION
   // ============================================================
   
-  // Load state first
   loadState();
   
-  // Initialize enhanced anti-dump protection
   const protection = new EnhancedAntiDumpProtection();
   window.__DWR_PROTECTION = protection;
   protection.startMonitoring();
   protection.protectConsole();
   
-  // Check session on load
   checkSession();
   
-  // Initialize database and render
   initDB().then(() => {
     renderAll();
-    console.log('✅ DWR APK Manager initialized with enhanced anti-dump protection');
-    console.log('🔒 Session persistence enabled - login state preserved across reloads');
+    console.log('✅ DWR APK Manager initialized');
+    console.log('🔒 Admin username "' + RESERVED_ADMIN_USERNAME + '" is permanently reserved');
   }).catch(error => {
     console.error('IndexedDB error:', error);
     toast('⚠️ Storage error: ' + error.message, 'error');
     renderAll();
   });
   
-  // Show register if no users
   if (state.users.length === 0) {
     document.getElementById('authToggle').click();
   }
 
-  // Close sidebar on outside click
   document.addEventListener('click', function(e) {
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburgerBtn');
@@ -1597,14 +1634,13 @@
     }
   });
 
-  // Keyboard shortcut: Escape to close sidebar
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('adminReservedDialog').classList.add('hidden');
     }
   });
 
-  // Auto-refresh session timeout check every minute
   setInterval(() => {
     checkSession();
   }, 60000);
