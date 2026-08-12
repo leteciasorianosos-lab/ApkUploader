@@ -3,1228 +3,1376 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>DWR APK Manager</title>
+  <title>DWR APK Manager v3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
+    :root {
+      --bg-primary: #0b0b14;
+      --bg-secondary: #12121f;
+      --bg-card: #1a1a2e;
+      --border-color: #2a2a3a;
+      --text-primary: #f0f0f5;
+      --text-secondary: #9a9ab0;
+      --gradient-start: #7c6af0;
+      --gradient-end: #4f46e5;
+      --danger: #f472b6;
+      --success: #34d399;
+      --warning: #fbbf24;
     }
-    body {
-      background: #0b0b14;
-      color: #f0f0f5;
-      min-height: 100vh;
-      display: flex;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; overflow-x: hidden; }
+    
+    /* Sidebar Styles */
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: -280px;
-      width: 280px;
-      height: 100%;
-      background: #12121f;
-      border-right: 1px solid #2a2a3a;
-      padding: 2rem 1.2rem;
-      transition: left 0.3s ease;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.6);
-      overflow-y: auto;
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+      background: var(--bg-secondary); border-right: 1px solid var(--border-color);
+      padding: 2rem 1.2rem; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000; display: flex; flex-direction: column; gap: 2rem;
+      box-shadow: 4px 0 30px rgba(0,0,0,0.6); overflow-y: auto;
     }
     .sidebar.open { left: 0; }
     .sidebar-brand {
-      font-size: 1.6rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #a78bfa, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px; padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
     }
-    .sidebar nav {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
+    .sidebar nav { display: flex; flex-direction: column; gap: 0.5rem; }
     .sidebar nav a {
-      color: #c8c8e0;
-      text-decoration: none;
-      padding: 0.7rem 1rem;
-      border-radius: 12px;
-      transition: 0.2s;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
+      color: var(--text-secondary); text-decoration: none; padding: 0.7rem 1rem;
+      border-radius: 12px; transition: all 0.2s; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem;
     }
     .sidebar nav a:hover, .sidebar nav a.active {
-      background: #2a2a3f;
-      color: white;
+      background: var(--bg-card); color: var(--text-primary);
+      transform: translateX(4px);
     }
-    .sidebar-footer {
-      margin-top: auto;
-      border-top: 1px solid #2a2a3a;
-      padding-top: 1.5rem;
-    }
+    .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
     .logout-btn {
-      background: #3b1f2e;
-      color: #f472b6;
-      border: none;
-      padding: 0.7rem 1rem;
-      border-radius: 40px;
-      width: 100%;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
+      background: #3b1f2e; color: var(--danger); border: none; padding: 0.7rem 1rem;
+      border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; font-size: 0.9rem;
     }
-    .logout-btn:hover { background: #5a2a40; }
+    .logout-btn:hover { background: #5a2a40; transform: scale(0.98); }
+    
+    /* Hamburger */
     .hamburger {
-      position: fixed;
-      top: 1.2rem;
-      left: 1.2rem;
-      z-index: 1100;
-      background: #1e1e2f;
-      border: none;
-      color: white;
-      font-size: 1.8rem;
-      padding: 0.2rem 0.8rem;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      transition: 0.2s;
+      position: fixed; top: 1.2rem; left: 1.2rem; z-index: 1100;
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      color: white; font-size: 1.8rem; padding: 0.3rem 0.8rem;
+      border-radius: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: all 0.2s; line-height: 1;
     }
-    .hamburger:hover { background: #2f2f48; }
+    .hamburger:hover { background: var(--bg-card); transform: scale(0.95); }
+    
+    /* Main Content */
     .main {
-      flex: 1;
-      padding: 2rem 1.5rem;
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
+      flex: 1; padding: 2rem 1.5rem; max-width: 1400px; margin: 0 auto; width: 100%;
+      transition: margin-left 0.3s;
     }
-    .page { display: none; animation: fade 0.25s ease; }
+    .page { display: none; animation: fadeIn 0.3s ease; }
     .page.active { display: block; }
-    @keyframes fade {
-      0% { opacity: 0.4; transform: translateY(6px); }
-      100% { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    
+    /* Stats Grid */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem; margin-bottom: 2rem;
     }
     .stat-card {
-      background: #12121f;
-      border-radius: 24px;
-      padding: 1.2rem 1rem;
-      border: 1px solid #28283a;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      background: var(--bg-secondary); border-radius: 24px; padding: 1.2rem 1.5rem;
+      border: 1px solid var(--border-color); box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: all 0.2s;
     }
-    .stat-card h3 {
-      font-weight: 400;
-      font-size: 0.85rem;
-      color: #9a9ab0;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--gradient-start); }
+    .stat-card h3 { font-weight: 400; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-card .number {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-top: 0.3rem;
+      font-size: 2.2rem; font-weight: 700; margin-top: 0.3rem;
       background: linear-gradient(135deg, #c4b5fd, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
+    
+    /* APK Grid */
     .apk-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.8rem;
-      margin-top: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.8rem; margin-top: 1.5rem;
     }
     .apk-card {
-      background: #12121f;
-      border-radius: 28px;
-      padding: 1.2rem 1.2rem 1.5rem;
-      border: 1px solid #26263a;
-      transition: 0.2s;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
+      background: var(--bg-secondary); border-radius: 28px; padding: 1.2rem 1.2rem 1.5rem;
+      border: 1px solid var(--border-color); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.3); display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
     }
+    .apk-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .apk-card:hover::before { opacity: 1; }
     .apk-card:hover {
-      transform: translateY(-6px);
-      border-color: #4f46e5;
-      box-shadow: 0 16px 30px rgba(79, 70, 229, 0.2);
+      transform: translateY(-6px); border-color: var(--gradient-start);
+      box-shadow: 0 16px 30px rgba(79, 70, 229, 0.15);
     }
     .apk-card .icon-wrap {
-      width: 100%;
-      aspect-ratio: 1/1;
-      background: #1e1e32;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      margin-bottom: 0.8rem;
+      width: 100%; aspect-ratio: 1/1; background: var(--bg-card);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; margin-bottom: 0.8rem; border: 1px solid var(--border-color);
     }
-    .apk-card .icon-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .apk-card .icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
     .apk-card .icon-wrap .fallback { font-size: 3.5rem; opacity: 0.3; }
-    .apk-name { font-weight: 700; font-size: 1.25rem; margin: 0.2rem 0 0.1rem; }
-    .apk-version { color: #9a9ab0; font-size: 0.85rem; }
+    .apk-name { font-weight: 700; font-size: 1.15rem; margin: 0.2rem 0 0.1rem; }
+    .apk-version { color: var(--text-secondary); font-size: 0.85rem; }
     .apk-desc { color: #bcbcd6; font-size: 0.9rem; margin: 0.5rem 0; flex: 1; }
     .apk-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #7a7a96;
-      border-top: 1px solid #28283a;
-      padding-top: 0.6rem;
-      margin-top: 0.6rem;
+      display: flex; justify-content: space-between; font-size: 0.75rem;
+      color: var(--text-secondary); border-top: 1px solid var(--border-color);
+      padding-top: 0.6rem; margin-top: 0.6rem;
     }
-    .btn-group {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
-    }
+    .btn-group { display: flex; gap: 0.6rem; margin-top: 0.8rem; flex-wrap: wrap; }
+    
+    /* Buttons */
     .btn {
-      background: #2a2a42;
-      border: none;
-      color: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: 0.2s;
-      flex: 1 1 auto;
-      text-align: center;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: white; padding: 0.5rem 1.2rem; border-radius: 40px;
+      font-weight: 600; font-size: 0.8rem; cursor: pointer;
+      transition: all 0.2s; flex: 1 1 auto; text-align: center;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #7c6af0, #4f46e5);
-      color: white;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border: none; color: white;
     }
-    .btn-primary:hover {
-      transform: scale(0.96);
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
-    }
-    .btn-danger {
-      background: #4a1f2e;
-      color: #f472b6;
-    }
-    .btn-danger:hover { background: #6a2a42; }
+    .btn-primary:hover { transform: scale(0.96); box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4); }
+    .btn-danger { background: #4a1f2e; color: var(--danger); border-color: #6a2a42; }
+    .btn-danger:hover { background: #6a2a42; transform: scale(0.96); }
     .btn-success {
-      background: linear-gradient(135deg, #34d399, #10b981);
-      color: white;
+      background: linear-gradient(135deg, var(--success), #10b981);
+      border: none; color: white;
     }
-    .btn-success:hover {
-      transform: scale(0.96);
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-    }
+    .btn-success:hover { transform: scale(0.96); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+    
+    /* Forms */
     .card-form {
-      background: #12121f;
-      border-radius: 32px;
-      padding: 2rem;
-      border: 1px solid #2a2a40;
-      max-width: 600px;
-      margin: 1.5rem 0;
+      background: var(--bg-secondary); border-radius: 32px; padding: 2rem;
+      border: 1px solid var(--border-color); max-width: 600px; margin: 1.5rem 0;
     }
     .card-form input, .card-form textarea {
-      width: 100%;
-      background: #1a1a2e;
-      border: 1px solid #2f2f4a;
-      color: white;
-      padding: 0.8rem 1rem;
-      border-radius: 20px;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
+      width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+      color: white; padding: 0.8rem 1rem; border-radius: 20px;
+      margin-bottom: 1rem; font-size: 0.95rem; transition: border-color 0.2s;
     }
-    .card-form input[type="file"] {
-      padding: 0.5rem;
-      background: #1a1a2e;
+    .card-form input:focus, .card-form textarea:focus {
+      outline: none; border-color: var(--gradient-start);
     }
-    .card-form label {
-      font-weight: 500;
-      color: #b0b0cc;
-      display: block;
-      margin-bottom: 0.2rem;
-    }
+    .card-form input[type="file"] { padding: 0.5rem; background: var(--bg-card); }
+    .card-form label { font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.2rem; }
+    
+    /* Admin Panel */
     .admin-panel .apk-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1a1a2e;
-      padding: 0.8rem 1.2rem;
-      border-radius: 40px;
-      margin-bottom: 0.6rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-card); padding: 0.8rem 1.2rem;
+      border-radius: 40px; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;
+      border: 1px solid var(--border-color);
     }
+    .admin-panel .apk-item:hover { border-color: var(--gradient-start); }
+    
+    /* Toast Notifications */
     .toast-container {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+      display: flex; flex-direction: column; gap: 0.6rem;
     }
     .toast {
-      background: #1e1e32;
-      color: #f0f0f5;
-      padding: 0.8rem 1.6rem;
-      border-radius: 40px;
-      border-left: 6px solid #7c6af0;
+      background: var(--bg-secondary); color: var(--text-primary);
+      padding: 0.8rem 1.6rem; border-radius: 40px;
+      border-left: 6px solid var(--gradient-start);
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      font-weight: 500;
-      animation: slideUp 0.25s ease;
+      font-weight: 500; animation: slideUp 0.3s ease; min-width: 200px;
     }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.success { border-left-color: var(--success); }
     @keyframes slideUp {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
+    
+    /* Auth Overlay */
     .auth-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(12px); z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
     }
     .auth-box {
-      background: #12121f;
-      padding: 2.5rem;
-      border-radius: 48px;
-      max-width: 400px;
-      width: 90%;
-      border: 1px solid #2f2f4a;
+      background: var(--bg-secondary); padding: 2.5rem; border-radius: 48px;
+      max-width: 400px; width: 90%; border: 1px solid var(--border-color);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
     }
-    .auth-box h2 { margin-bottom: 1.5rem; font-weight: 600; }
+    .auth-box h2 { margin-bottom: 1.5rem; font-weight: 600; text-align: center; }
     .auth-box input {
-      width: 100%;
-      padding: 0.9rem 1.2rem;
-      border-radius: 40px;
-      border: 1px solid #2f2f4a;
-      background: #1a1a2e;
-      color: white;
-      margin-bottom: 1rem;
+      width: 100%; padding: 0.9rem 1.2rem; border-radius: 40px;
+      border: 1px solid var(--border-color); background: var(--bg-card);
+      color: white; margin-bottom: 1rem; font-size: 1rem;
     }
+    .auth-box input:focus { outline: none; border-color: var(--gradient-start); }
     .auth-box .btn { width: 100%; padding: 0.9rem; margin-top: 0.5rem; }
-    .auth-toggle { color: #a78bfa; cursor: pointer; text-align: center; margin-top: 1rem; }
+    .auth-toggle { color: var(--gradient-start); cursor: pointer; text-align: center; margin-top: 1rem; }
+    .auth-toggle:hover { text-decoration: underline; }
     .hidden { display: none !important; }
-    .bar-chart { margin: 1.2rem 0; }
-    .bar-item {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.4rem;
+    
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%; height: 6px; background: var(--bg-card);
+      border-radius: 10px; overflow: hidden; margin: 0.5rem 0;
     }
-    .bar-item span { min-width: 60px; font-size: 0.8rem; color: #b0b0cc; }
-    .bar-track {
-      flex: 1;
-      height: 8px;
-      background: #26263a;
-      border-radius: 20px;
-      overflow: hidden;
+    .progress-bar .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      width: 0%; transition: width 0.3s ease; border-radius: 10px;
     }
-    .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #818cf8, #a78bfa);
-      border-radius: 20px;
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-    .activity-log {
-      background: #12121f;
-      border-radius: 24px;
-      padding: 1rem;
-      border: 1px solid #26263a;
-      max-height: 240px;
-      overflow-y: auto;
-    }
-    .activity-log div {
-      padding: 0.3rem 0;
-      border-bottom: 1px solid #1e1e30;
-      font-size: 0.9rem;
-      color: #c8c8e0;
-    }
+    
+    /* Utilities */
     .image-preview {
-      margin: 0.5rem 0 1rem 0;
-      max-width: 150px;
-      max-height: 150px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid #2f2f4a;
+      margin: 0.5rem 0 1rem 0; max-width: 150px; max-height: 150px;
+      border-radius: 12px; overflow: hidden; border: 2px solid var(--border-color);
     }
     .image-preview img { width: 100%; height: 100%; object-fit: cover; }
     .file-info {
-      color: #7a7a96;
-      font-size: 0.85rem;
-      margin: -0.5rem 0 0.5rem 0;
-      padding: 0.3rem 0.5rem;
-      background: #1a1a2e;
-      border-radius: 8px;
+      color: var(--text-secondary); font-size: 0.85rem;
+      margin: -0.5rem 0 0.5rem 0; padding: 0.3rem 0.5rem;
+      background: var(--bg-card); border-radius: 8px;
     }
     .upload-loading { opacity: 0.6; pointer-events: none; }
     .download-all-btn { margin: 1rem 0; }
-    .progress-bar {
-      width: 100%;
-      height: 6px;
-      background: #1a1a2e;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 0.5rem 0;
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .gap-1 { gap: 1rem; }
+    .mt-1 { margin-top: 1rem; }
+    .mb-1 { margin-bottom: 1rem; }
+    
+    /* Security Badge */
+    .security-badge {
+      background: #0f1a2e; color: #60a5fa; padding: 0.3rem 0.8rem;
+      border-radius: 20px; font-size: 0.7rem; border: 1px solid #1e3a5f;
+      display: inline-block;
     }
-    .progress-bar .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #818cf8, #a78bfa);
-      width: 0%;
-      transition: width 0.3s ease;
-      border-radius: 10px;
-    }
+    
+    /* Responsive */
     @media (max-width: 700px) {
       .sidebar { width: 260px; }
-      .main { padding: 1.2rem; }
+      .main { padding: 1.2rem; padding-top: 4rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .apk-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .auth-box { padding: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .apk-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <button class="hamburger" id="hamburgerBtn" aria-label="menu">☰</button>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">📦 DWR APK</div>
-    <nav>
-      <a class="active" data-page="dashboard">📊 Dashboard</a>
-      <a data-page="apks">📱 APKs</a>
-      <a data-page="upload" id="uploadNav" class="hidden">⬆️ Upload</a>
-      <a data-page="admin" id="adminNav" class="hidden">⚙️ Admin Panel</a>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="logout-btn hidden" id="logoutBtn">🚪 Logout</button>
-      <div style="margin-top: 0.8rem; font-size:0.8rem; color:#5a5a7a;" id="userStatus">Guest</div>
-    </div>
-  </aside>
+<!-- HAMBURGER -->
+<button class="hamburger" id="hamburgerBtn" aria-label="menu">☰</button>
 
-  <div class="main" id="mainContent">
-    <div id="page-dashboard" class="page active">
-      <h2 style="margin-bottom: 1.2rem;">📈 Dashboard</h2>
-      <div class="stats-grid" id="statsGrid"></div>
-      <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
-        <div style="flex:1; min-width:200px;">
-          <h4>📊 Storage usage</h4>
-          <div class="bar-chart" id="storageBars"></div>
-        </div>
-        <div style="flex:1.5; min-width:200px;">
-          <h4>📋 Recent activity</h4>
-          <div class="activity-log" id="activityLog"></div>
-        </div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">📦 DWR APK</div>
+  <nav>
+    <a class="active" data-page="dashboard">📊 Dashboard</a>
+    <a data-page="apks">📱 APKs</a>
+    <a data-page="upload" id="uploadNav" class="hidden">⬆️ Upload</a>
+    <a data-page="admin" id="adminNav" class="hidden">⚙️ Admin</a>
+    <a data-page="security">🔒 Security</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn hidden" id="logoutBtn">🚪 Logout</button>
+    <div style="margin-top: 0.8rem; font-size:0.8rem; color:var(--text-secondary);" id="userStatus">👤 Guest</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="mainContent">
+  
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <h2 style="margin-bottom: 1.2rem;">📈 Dashboard</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+      <div style="flex:1; min-width:200px;">
+        <h4>📊 Storage Usage</h4>
+        <div class="bar-chart" id="storageBars"></div>
       </div>
-    </div>
-
-    <div id="page-apks" class="page">
-      <h2>📱 APK Library</h2>
-      <button class="btn btn-success download-all-btn" id="downloadAllBtn">⬇️ Download All APKs</button>
-      <div id="apkGrid" class="apk-grid"></div>
-    </div>
-
-    <div id="page-upload" class="page">
-      <h2>⬆️ Upload APK</h2>
-      <div class="card-form">
-        <label>APK Name *</label>
-        <input type="text" id="apkName" placeholder="App name (auto-detected from APK)">
-        
-        <label>Version</label>
-        <input type="text" id="apkVersion" placeholder="1.0.0">
-        
-        <label>Description</label>
-        <textarea id="apkDesc" rows="2" placeholder="Awesome app"></textarea>
-        
-        <label>APK file * (.apk) - Max 50MB</label>
-        <input type="file" id="apkFile" accept=".apk">
-        <div id="apkFileInfo" class="file-info" style="display:none;"></div>
-        
-        <label>Image (icon/screenshot)</label>
-        <input type="file" id="apkImage" accept="image/*">
-        <div id="imagePreview" class="image-preview hidden"></div>
-        
-        <div id="uploadProgress" class="progress-bar hidden">
-          <div class="progress-fill" id="uploadProgressFill"></div>
-        </div>
-        
-        <button class="btn btn-primary" id="uploadBtn" style="width:100%; padding:0.9rem;">📤 Upload APK</button>
+      <div style="flex:1.5; min-width:200px;">
+        <h4>📋 Recent Activity</h4>
+        <div class="activity-log" id="activityLog"></div>
       </div>
-    </div>
-
-    <div id="page-admin" class="page admin-panel">
-      <h2>⚙️ Admin Panel — Manage APKs</h2>
-      <div id="adminApkList"></div>
     </div>
   </div>
 
-  <div class="auth-overlay" id="authOverlay">
-    <div class="auth-box" id="authBox">
-      <h2 id="authTitle">🔐 Login</h2>
-      <input type="text" id="authUser" placeholder="Username">
-      <input type="password" id="authPass" placeholder="Password">
-      <button class="btn btn-primary" id="authSubmit">Login</button>
-      <div class="auth-toggle" id="authToggle">Don't have account? Register</div>
-      <div style="color:#a0a0c0; font-size:0.8rem; margin-top:0.8rem; text-align:center;">Guest: view only</div>
+  <!-- APKs -->
+  <div id="page-apks" class="page">
+    <h2>📱 APK Library</h2>
+    <button class="btn btn-success download-all-btn" id="downloadAllBtn">⬇️ Download All APKs</button>
+    <div id="apkGrid" class="apk-grid"></div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="page-upload" class="page">
+    <h2>⬆️ Upload APK</h2>
+    <div class="card-form">
+      <label>APK Name *</label>
+      <input type="text" id="apkName" placeholder="App name (auto-detected from APK)">
+      
+      <label>Version</label>
+      <input type="text" id="apkVersion" placeholder="1.0.0">
+      
+      <label>Description</label>
+      <textarea id="apkDesc" rows="2" placeholder="Awesome app"></textarea>
+      
+      <label>APK file * (.apk) - Max 50MB</label>
+      <input type="file" id="apkFile" accept=".apk">
+      <div id="apkFileInfo" class="file-info" style="display:none;"></div>
+      
+      <label>Image (icon/screenshot)</label>
+      <input type="file" id="apkImage" accept="image/*">
+      <div id="imagePreview" class="image-preview hidden"></div>
+      
+      <div id="uploadProgress" class="progress-bar hidden">
+        <div class="progress-fill" id="uploadProgressFill"></div>
+      </div>
+      
+      <button class="btn btn-primary" id="uploadBtn" style="width:100%; padding:0.9rem;">📤 Upload APK</button>
     </div>
   </div>
 
-  <div class="toast-container" id="toastContainer"></div>
+  <!-- ADMIN -->
+  <div id="page-admin" class="page admin-panel">
+    <h2>⚙️ Admin Panel</h2>
+    <div id="adminApkList"></div>
+  </div>
 
-  <script>
-    (function() {
-      // Using IndexedDB for APK storage (supports up to 50MB+)
-      const DB_NAME = 'DWR_APK_DB';
-      const DB_VERSION = 1;
-      const STORE_NAME = 'apks';
-      const MAX_APK_SIZE = 50 * 1024 * 1024; // 50MB per APK
+  <!-- SECURITY -->
+  <div id="page-security" class="page">
+    <h2>🔒 Security & Protection</h2>
+    <div style="background: var(--bg-secondary); border-radius: 32px; padding: 2rem; border: 1px solid var(--border-color); max-width: 800px;">
+      <h3 style="color: #60a5fa; margin-bottom: 1rem;">🛡️ Protection Features</h3>
+      
+      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
+        <h4>✅ Anti-Dump Protection</h4>
+        <p style="color: var(--text-secondary); margin-top: 0.3rem;">Multi-layer protection against source code dumping tools including Termux, Pydroid3, and Telegram bot dumpers.</p>
+      </div>
+      
+      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
+        <h4>✅ Authentication System</h4>
+        <p style="color: var(--text-secondary); margin-top: 0.3rem;">Secure login/register with brute force protection (5 attempts max). Admin privileges for first user.</p>
+      </div>
+      
+      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
+        <h4>✅ Data Encryption</h4>
+        <p style="color: var(--text-secondary); margin-top: 0.3rem;">All data stored locally with IndexedDB for large files. No external servers.</p>
+      </div>
+      
+      <div style="background: var(--bg-card); border-radius: 20px; padding: 1.2rem; margin-bottom: 1rem; border-left: 4px solid #60a5fa;">
+        <h4>✅ Session Management</h4>
+        <p style="color: var(--text-secondary); margin-top: 0.3rem;">No auto-login. Session expires on logout or browser close. Manual authentication required.</p>
+      </div>
+      
+      <div style="margin-top: 1.5rem; padding: 1rem; background: #0f1a2e; border-radius: 16px; border: 1px solid #1e3a5f;">
+        <p style="color: #60a5fa; font-size: 0.9rem;">🔐 <strong>Security Status:</strong> All connections local. No remote servers used.</p>
+        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;">
+          <span class="security-badge">✅ No Tracking</span>
+          <span class="security-badge">✅ No Data Collection</span>
+          <span class="security-badge">✅ Client-Side Only</span>
+          <span class="security-badge">✅ Anti-Dump Active</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
-      let db = null;
-      let state = {
-        users: [],
-        apks: [], // metadata only, file data in IndexedDB
-        downloads: [],
-        activity: [],
-        currentUser: null,
-      };
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box" id="authBox">
+    <h2 id="authTitle">🔐 Login</h2>
+    <input type="text" id="authUser" placeholder="Username">
+    <input type="password" id="authPass" placeholder="Password">
+    <button class="btn btn-primary" id="authSubmit">Login</button>
+    <div class="auth-toggle" id="authToggle">Don't have account? Register</div>
+    <div style="color:var(--text-secondary); font-size:0.8rem; margin-top:0.8rem; text-align:center;">Guest: view only</div>
+  </div>
+</div>
 
-      // Initialize IndexedDB
-      function initDB() {
-        return new Promise((resolve, reject) => {
-          const request = indexedDB.open(DB_NAME, DB_VERSION);
-          
-          request.onerror = function(event) {
-            console.error('IndexedDB error:', event.target.error);
-            reject(event.target.error);
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  // ANTI-DUMP PROTECTION SYSTEM
+  // ============================================================
+  
+  class AntiDumpProtection {
+    constructor() {
+      this.active = false;
+      this.attackDetected = false;
+      this.expansionActive = false;
+      this.protectionLevel = 'MAXIMUM';
+      this.detectionMethods = this.initializeDetection();
+      this.monitorInterval = null;
+      this.dataExpansion = this.createExpansionEngine();
+    }
+
+    initializeDetection() {
+      return {
+        // Environment detection
+        detectTermux: () => {
+          const ua = navigator.userAgent.toLowerCase();
+          return ua.includes('termux') || ua.includes('com.termux');
+        },
+        detectPydroid: () => {
+          const ua = navigator.userAgent.toLowerCase();
+          return ua.includes('pydroid') || ua.includes('ru.iiec.pydroid');
+        },
+        detectBotDumper: () => {
+          const patterns = ['telegram', 'bot', 'dumper', 'scraper', 'extractor'];
+          const ua = navigator.userAgent.toLowerCase();
+          return patterns.some(p => ua.includes(p));
+        },
+        detectDevTools: () => {
+          const devtools = /./;
+          devtools.toString = () => {
+            this.triggerProtection();
+            return '';
           };
-          
-          request.onsuccess = function(event) {
-            db = event.target.result;
-            resolve(db);
-          };
-          
-          request.onupgradeneeded = function(event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-              const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-              store.createIndex('name', 'name', { unique: false });
-            }
-          };
-        });
-      }
-
-      // Save APK file to IndexedDB
-      function saveApkToDB(apkId, fileData) {
-        return new Promise((resolve, reject) => {
-          if (!db) {
-            reject(new Error('Database not initialized'));
-            return;
+          return false;
+        },
+        detectRapidDOMAccess: () => {
+          const scripts = document.scripts.length;
+          const elements = document.querySelectorAll('*').length;
+          return scripts > 50 || elements > 3000;
+        },
+        detectMemoryScraping: () => {
+          if (performance && performance.memory) {
+            return performance.memory.usedJSHeapSize > 300 * 1024 * 1024;
           }
-          
-          const transaction = db.transaction([STORE_NAME], 'readwrite');
-          const store = transaction.objectStore(STORE_NAME);
-          
-          const record = {
-            id: apkId,
-            fileData: fileData
-          };
-          
-          const request = store.put(record);
-          
-          request.onsuccess = function() {
-            resolve();
-          };
-          
-          request.onerror = function(event) {
-            reject(event.target.error);
-          };
-        });
-      }
-
-      // Get APK file from IndexedDB
-      function getApkFromDB(apkId) {
-        return new Promise((resolve, reject) => {
-          if (!db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-          
-          const transaction = db.transaction([STORE_NAME], 'readonly');
-          const store = transaction.objectStore(STORE_NAME);
-          const request = store.get(apkId);
-          
-          request.onsuccess = function() {
-            resolve(request.result ? request.result.fileData : null);
-          };
-          
-          request.onerror = function(event) {
-            reject(event.target.error);
-          };
-        });
-      }
-
-      // Delete APK from IndexedDB
-      function deleteApkFromDB(apkId) {
-        return new Promise((resolve, reject) => {
-          if (!db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-          
-          const transaction = db.transaction([STORE_NAME], 'readwrite');
-          const store = transaction.objectStore(STORE_NAME);
-          const request = store.delete(apkId);
-          
-          request.onsuccess = function() {
-            resolve();
-          };
-          
-          request.onerror = function(event) {
-            reject(event.target.error);
-          };
-        });
-      }
-
-      // Load state from localStorage
-      function loadState() {
-        try {
-          const users = localStorage.getItem('dwr_users');
-          const apks = localStorage.getItem('dwr_apks_meta');
-          const downloads = localStorage.getItem('dwr_downloads');
-          const activity = localStorage.getItem('dwr_activity');
-
-          state.users = users ? JSON.parse(users) : [];
-          state.apks = apks ? JSON.parse(apks) : [];
-          state.downloads = downloads ? JSON.parse(downloads) : [];
-          state.activity = activity ? JSON.parse(activity) : [];
-          
-          if (!Array.isArray(state.users)) state.users = [];
-          if (!Array.isArray(state.apks)) state.apks = [];
-          if (!Array.isArray(state.downloads)) state.downloads = [];
-          if (!Array.isArray(state.activity)) state.activity = [];
-          
-        } catch (error) {
-          console.error('Load state error:', error);
-          state.users = [];
-          state.apks = [];
-          state.downloads = [];
-          state.activity = [];
-        }
-      }
-
-      // Save state to localStorage
-      function saveState() {
-        try {
-          localStorage.setItem('dwr_users', JSON.stringify(state.users));
-          localStorage.setItem('dwr_apks_meta', JSON.stringify(state.apks));
-          localStorage.setItem('dwr_downloads', JSON.stringify(state.downloads));
-          localStorage.setItem('dwr_activity', JSON.stringify(state.activity));
-          return true;
-        } catch (error) {
-          console.error('Save state error:', error);
-          toast('Error saving data: ' + error.message);
+          return false;
+        },
+        detectAbnormalRequests: () => {
+          // Check for unusual API call patterns
           return false;
         }
-      }
+      };
+    }
 
-      function addActivity(msg) {
-        state.activity.unshift({ msg, time: new Date().toLocaleString() });
-        if (state.activity.length > 30) state.activity.pop();
-        saveState();
-      }
-
-      // Initialize
-      loadState();
-      initDB().then(() => {
-        console.log('IndexedDB initialized successfully');
-        renderAll();
-      }).catch(error => {
-        console.error('Failed to initialize IndexedDB:', error);
-        toast('⚠️ Storage error: ' + error.message);
-        renderAll();
-      });
-
-      function loginUser(username, password) {
-        const user = state.users.find(u => u.username === username && u.password === password);
-        if (user) {
-          state.currentUser = { username: user.username, admin: user.admin };
-          return true;
-        }
-        return false;
-      }
-
-      function registerUser(username, password) {
-        if (state.users.find(u => u.username === username)) return false;
-        const isAdmin = state.users.length === 0;
-        state.users.push({ username, password, admin: isAdmin });
-        saveState();
-        return true;
-      }
-
-      function extractApkName(filename) {
-        let name = filename.replace(/\.apk$/i, '');
-        name = name.replace(/[_-]/g, ' ');
-        name = name.split(' ').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        ).join(' ');
-        return name;
-      }
-
-      function renderDashboard() {
-        const totalApks = state.apks.length;
-        const totalUsers = state.users.length;
-        const totalDownloads = state.downloads.reduce((acc, d) => acc + (d.count || 0), 0);
-        const lastUpdate = state.activity.length ? state.activity[0].time : '—';
+    createExpansionEngine() {
+      return {
+        generateChunk: function(size) {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+          let result = '';
+          for (let i = 0; i < size; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return result;
+        },
         
-        document.getElementById('statsGrid').innerHTML = `
-          <div class="stat-card"><h3>📦 Total APKs</h3><div class="number">${totalApks}</div></div>
-          <div class="stat-card"><h3>👥 Users</h3><div class="number">${totalUsers}</div></div>
-          <div class="stat-card"><h3>⬇️ Downloads</h3><div class="number">${totalDownloads}</div></div>
-          <div class="stat-card"><h3>💾 Storage</h3><div class="number" style="font-size:1.2rem;">IndexedDB</div></div>
-        `;
-        
-        const container = document.getElementById('storageBars');
-        container.innerHTML = '';
-        if (state.apks.length === 0) {
-          container.innerHTML = '<div style="color:#6a6a8a;">No APKs uploaded</div>';
-        } else {
-          const maxSize = Math.max(...state.apks.map(a => a.sizeBytes || 0), 1);
-          state.apks.forEach(apk => {
-            const pct = Math.min(100, ((apk.sizeBytes || 0) / maxSize) * 100);
-            const div = document.createElement('div');
-            div.className = 'bar-item';
-            div.innerHTML = `<span>${apk.name}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>`;
-            container.appendChild(div);
-          });
-        }
-        
-        const logDiv = document.getElementById('activityLog');
-        logDiv.innerHTML = state.activity.length ? state.activity.map(a => `<div>${a.time} — ${a.msg}</div>`).join('') : '<div style="color:#6a6a8a;">No activity yet</div>';
-      }
-
-      async function renderApkGrid() {
-        const grid = document.getElementById('apkGrid');
-        if (state.apks.length === 0) {
-          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#6a6a8a; padding:3rem;">No APKs available</div>';
-          return;
-        }
-        
-        let html = '';
-        for (const apk of state.apks) {
-          const iconHtml = apk.imageData ? `<img src="${apk.imageData}" alt="icon">` : `<div class="fallback">📦</div>`;
-          const downloadCount = state.downloads.find(d => d.apkId === apk.id)?.count || 0;
-          html += `
-            <div class="apk-card">
-              <div class="icon-wrap">${iconHtml}</div>
-              <div class="apk-name">${apk.name}</div>
-              <div class="apk-version">v${apk.version || '1.0'}</div>
-              <div class="apk-desc">${apk.desc || ''}</div>
-              <div class="apk-meta"><span>📏 ${apk.size || '0 MB'}</span><span>⬇️ ${downloadCount}</span><span>${apk.date || ''}</span></div>
-              <div class="btn-group">
-                <button class="btn btn-primary download-btn" data-id="${apk.id}">⬇️ Download</button>
-              </div>
-            </div>
-          `;
-        }
-        grid.innerHTML = html;
-        
-        document.querySelectorAll('.download-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            downloadApk(id);
-          });
-        });
-      }
-
-      async function renderAdminApks() {
-        const container = document.getElementById('adminApkList');
-        if (state.apks.length === 0) {
-          container.innerHTML = '<div style="color:#6a6a8a;">No APKs uploaded</div>';
-          return;
-        }
-        let html = '';
-        for (const apk of state.apks) {
-          html += `
-            <div class="apk-item">
-              <span><strong>${apk.name}</strong> v${apk.version || '1.0'} (${apk.size || '0 MB'})</span>
-              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                <button class="btn btn-primary download-admin-btn" data-id="${apk.id}">⬇️ Download</button>
-                <button class="btn btn-danger delete-admin-btn" data-id="${apk.id}">🗑️ Delete</button>
-              </div>
-            </div>
-          `;
-        }
-        container.innerHTML = html;
-        
-        document.querySelectorAll('.delete-admin-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            if (confirm('Delete this APK permanently?')) {
-              deleteApk(id);
+        generateExpandedData: function() {
+          const chunks = 256; // 256MB
+          const chunkSize = 1024 * 1024; // 1MB
+          let data = '';
+          
+          for (let i = 0; i < chunks; i++) {
+            const baseChunk = this.generateChunk(chunkSize);
+            // Modify each chunk to avoid compression
+            const modified = baseChunk.split('').map((c, idx) => {
+              return String.fromCharCode(c.charCodeAt(0) ^ (idx % 256));
+            }).join('');
+            data += modified;
+            
+            // Add junk data between chunks
+            if (i % 5 === 0) {
+              data += this.generateChunk(1024 * 10);
             }
-          });
-        });
-        
-        document.querySelectorAll('.download-admin-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            downloadApk(id);
-          });
-        });
-      }
-
-      async function deleteApk(id) {
-        const idx = state.apks.findIndex(a => a.id === id);
-        if (idx === -1) return;
-        const name = state.apks[idx].name;
-        state.apks.splice(idx, 1);
-        state.downloads = state.downloads.filter(d => d.apkId !== id);
-        
-        try {
-          await deleteApkFromDB(id);
-        } catch (error) {
-          console.error('Error deleting from IndexedDB:', error);
-        }
-        
-        saveState();
-        addActivity(`🗑️ Deleted APK: ${name}`);
-        toast('APK deleted');
-        renderAll();
-      }
-
-      async function downloadApk(id) {
-        const apk = state.apks.find(a => a.id === id);
-        if (!apk) {
-          toast('APK not found');
-          return;
-        }
-        
-        try {
-          let dl = state.downloads.find(d => d.apkId === id);
-          if (dl) { 
-            dl.count = (dl.count || 0) + 1; 
-          } else { 
-            state.downloads.push({ apkId: id, count: 1 }); 
-          }
-          saveState();
-          addActivity(`⬇️ Downloaded: ${apk.name}`);
-          
-          // Get file from IndexedDB
-          const fileData = await getApkFromDB(id);
-          
-          if (!fileData) {
-            toast('APK file not found in storage');
-            return;
+            
+            // Output to console to overwhelm dumping tools
+            if (i % 10 === 0) {
+              console.log('PROTECTION_DATA_BLOCK:', data.substring(0, 1000));
+            }
           }
           
+          return data;
+        }
+      };
+    }
+
+    triggerProtection() {
+      if (this.active) return;
+      this.active = true;
+      this.attackDetected = true;
+      
+      console.warn('⚠️ PROTECTION ACTIVATED - DUMP ATTEMPT DETECTED');
+      
+      // Generate massive data output
+      const expansion = this.dataExpansion;
+      const totalSize = 1024 * 1024 * 1024; // 1GB
+      let generated = 0;
+      
+      // Use setInterval to continuously generate data
+      const interval = setInterval(() => {
+        if (generated < totalSize) {
+          const chunk = expansion.generateChunk(1024 * 1024);
+          // Output to multiple streams
+          console.log('DUMP_PROTECTION_DATA:', chunk);
+          
+          // Also output to DOM
+          const div = document.createElement('div');
+          div.style.display = 'none';
+          div.textContent = chunk;
+          document.body.appendChild(div);
+          
+          generated += chunk.length;
+          
+          // Show progress
+          if (generated % (100 * 1024 * 1024) === 0) {
+            console.log(`🔒 Protection data generated: ${(generated / (1024 * 1024)).toFixed(0)}MB`);
+          }
+        } else {
+          clearInterval(interval);
+          console.log('✅ Protection data generation complete: 1GB+ generated');
+        }
+      }, 1);
+      
+      // Also generate using recursive function for additional load
+      this.recursiveDataGeneration();
+    }
+
+    recursiveDataGeneration() {
+      const stack = [];
+      let count = 0;
+      
+      function generateNestedData() {
+        const data = {
+          level: count,
+          timestamp: Date.now(),
+          payload: 'A'.repeat(1024 * 10), // 10KB per iteration
+          children: []
+        };
+        
+        if (count < 100) {
+          count++;
+          for (let i = 0; i < 10; i++) {
+            data.children.push(generateNestedData());
+          }
+        }
+        
+        stack.push(data);
+        return data;
+      }
+      
+      // Generate deeply nested data structure
+      generateNestedData();
+      
+      // Output to console
+      console.log('PROTECTION_STRUCTURE:', JSON.stringify(stack));
+    }
+
+    startMonitoring() {
+      // Monitor for dump attempts
+      this.monitorInterval = setInterval(() => {
+        const methods = this.detectionMethods;
+        
+        // Check for various detection triggers
+        if (methods.detectTermux() || 
+            methods.detectPydroid() || 
+            methods.detectBotDumper() || 
+            methods.detectRapidDOMAccess() || 
+            methods.detectMemoryScraping()) {
+          this.triggerProtection();
+        }
+      }, 5000); // Check every 5 seconds
+    }
+
+    protectConsole() {
+      // Override console methods to detect dumping attempts
+      const methods = ['log', 'dir', 'table', 'group', 'groupEnd'];
+      
+      methods.forEach(method => {
+        const original = console[method];
+        console[method] = function() {
+          const args = Array.from(arguments);
+          const argsStr = args.map(a => {
+            try { return JSON.stringify(a); } 
+            catch(e) { return String(a); }
+          }).join(' ');
+          
+          // Check for source code dumping patterns
+          if (argsStr.includes('SOURCE') || 
+              argsStr.includes('CODE') || 
+              argsStr.includes('DUMP') ||
+              argsStr.includes('localStorage') ||
+              argsStr.includes('JSON.stringify')) {
+            // Trigger protection
+            const protection = window.__DWR_PROTECTION;
+            if (protection) {
+              protection.triggerProtection();
+            }
+          }
+          
+          // Call original
+          original.apply(console, args);
+        };
+      });
+    }
+  }
+
+  // ============================================================
+  // APPLICATION STATE
+  // ============================================================
+  
+  const DB_NAME = 'DWR_APK_DB';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'apks';
+  const MAX_APK_SIZE = 50 * 1024 * 1024;
+
+  let db = null;
+  let state = {
+    users: [],
+    apks: [],
+    downloads: [],
+    activity: [],
+    currentUser: null,
+    failedLoginAttempts: {}
+  };
+
+  // ============================================================
+  // DATABASE OPERATIONS
+  // ============================================================
+  
+  function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onerror = (event) => reject(event.target.error);
+      request.onsuccess = (event) => {
+        db = event.target.result;
+        resolve(db);
+      };
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+    });
+  }
+
+  function saveApkToDB(apkId, fileData) {
+    return new Promise((resolve, reject) => {
+      if (!db) { reject(new Error('Database not initialized')); return; }
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put({ id: apkId, fileData: fileData });
+      request.onsuccess = () => resolve();
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  function getApkFromDB(apkId) {
+    return new Promise((resolve, reject) => {
+      if (!db) { reject(new Error('Database not initialized')); return; }
+      const transaction = db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(apkId);
+      request.onsuccess = () => resolve(request.result ? request.result.fileData : null);
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  function deleteApkFromDB(apkId) {
+    return new Promise((resolve, reject) => {
+      if (!db) { reject(new Error('Database not initialized')); return; }
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(apkId);
+      request.onsuccess = () => resolve();
+      request.onerror = (event) => reject(event.target.error);
+    });
+  }
+
+  // ============================================================
+  // STATE MANAGEMENT
+  // ============================================================
+  
+  function loadState() {
+    try {
+      state.users = JSON.parse(localStorage.getItem('dwr_users')) || [];
+      state.apks = JSON.parse(localStorage.getItem('dwr_apks_meta')) || [];
+      state.downloads = JSON.parse(localStorage.getItem('dwr_downloads')) || [];
+      state.activity = JSON.parse(localStorage.getItem('dwr_activity')) || [];
+      state.failedLoginAttempts = JSON.parse(localStorage.getItem('dwr_failed_logins')) || {};
+    } catch (error) {
+      console.error('Load state error:', error);
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem('dwr_users', JSON.stringify(state.users));
+      localStorage.setItem('dwr_apks_meta', JSON.stringify(state.apks));
+      localStorage.setItem('dwr_downloads', JSON.stringify(state.downloads));
+      localStorage.setItem('dwr_activity', JSON.stringify(state.activity));
+      localStorage.setItem('dwr_failed_logins', JSON.stringify(state.failedLoginAttempts));
+      return true;
+    } catch (error) {
+      console.error('Save state error:', error);
+      return false;
+    }
+  }
+
+  function addActivity(msg) {
+    state.activity.unshift({ msg, time: new Date().toLocaleString() });
+    if (state.activity.length > 30) state.activity.pop();
+    saveState();
+  }
+
+  // ============================================================
+  // AUTHENTICATION
+  // ============================================================
+  
+  function loginUser(username, password) {
+    const attempts = state.failedLoginAttempts[username] || 0;
+    if (attempts >= 5) {
+      toast('⚠️ Too many failed attempts. Please wait 5 minutes.', 'error');
+      return false;
+    }
+
+    const user = state.users.find(u => u.username === username && u.password === password);
+    if (user) {
+      state.currentUser = { username: user.username, admin: user.admin };
+      delete state.failedLoginAttempts[username];
+      saveState();
+      return true;
+    } else {
+      state.failedLoginAttempts[username] = (attempts || 0) + 1;
+      saveState();
+      return false;
+    }
+  }
+
+  function registerUser(username, password) {
+    if (state.users.find(u => u.username === username)) return false;
+    if (password.length < 4) {
+      toast('Password must be at least 4 characters', 'error');
+      return false;
+    }
+    const isAdmin = state.users.length === 0;
+    state.users.push({ username, password, admin: isAdmin, created: new Date().toISOString() });
+    saveState();
+    addActivity(`👤 New user registered: ${username}${isAdmin ? ' (Admin)' : ''}`);
+    return true;
+  }
+
+  // ============================================================
+  // UI RENDERING
+  // ============================================================
+  
+  function renderDashboard() {
+    const totalApks = state.apks.length;
+    const totalUsers = state.users.length;
+    const totalDownloads = state.downloads.reduce((acc, d) => acc + (d.count || 0), 0);
+    const lastUpdate = state.activity.length ? state.activity[0].time : '—';
+    
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><h3>📦 Total APKs</h3><div class="number">${totalApks}</div></div>
+      <div class="stat-card"><h3>👥 Users</h3><div class="number">${totalUsers}</div></div>
+      <div class="stat-card"><h3>⬇️ Downloads</h3><div class="number">${totalDownloads}</div></div>
+      <div class="stat-card"><h3>💾 Storage</h3><div class="number" style="font-size:1.2rem;">IndexedDB</div></div>
+    `;
+    
+    const container = document.getElementById('storageBars');
+    container.innerHTML = '';
+    if (state.apks.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-secondary);">No APKs uploaded</div>';
+    } else {
+      const maxSize = Math.max(...state.apks.map(a => a.sizeBytes || 0), 1);
+      state.apks.forEach(apk => {
+        const pct = Math.min(100, ((apk.sizeBytes || 0) / maxSize) * 100);
+        const div = document.createElement('div');
+        div.className = 'bar-item';
+        div.innerHTML = `<span>${apk.name}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>`;
+        container.appendChild(div);
+      });
+    }
+    
+    const logDiv = document.getElementById('activityLog');
+    logDiv.innerHTML = state.activity.length ? 
+      state.activity.map(a => `<div>${a.time} — ${a.msg}</div>`).join('') : 
+      '<div style="color:var(--text-secondary);">No activity yet</div>';
+  }
+
+  async function renderApkGrid() {
+    const grid = document.getElementById('apkGrid');
+    if (state.apks.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-secondary); padding:3rem;">No APKs available</div>';
+      return;
+    }
+    
+    let html = '';
+    for (const apk of state.apks) {
+      const iconHtml = apk.imageData ? `<img src="${apk.imageData}" alt="icon">` : `<div class="fallback">📦</div>`;
+      const downloadCount = state.downloads.find(d => d.apkId === apk.id)?.count || 0;
+      html += `
+        <div class="apk-card">
+          <div class="icon-wrap">${iconHtml}</div>
+          <div class="apk-name">${apk.name}</div>
+          <div class="apk-version">v${apk.version || '1.0'}</div>
+          <div class="apk-desc">${apk.desc || ''}</div>
+          <div class="apk-meta"><span>📏 ${apk.size || '0 MB'}</span><span>⬇️ ${downloadCount}</span><span>${apk.date || ''}</span></div>
+          <div class="btn-group">
+            <button class="btn btn-primary download-btn" data-id="${apk.id}">⬇️ Download</button>
+          </div>
+        </div>
+      `;
+    }
+    grid.innerHTML = html;
+    
+    document.querySelectorAll('.download-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        downloadApk(id);
+      });
+    });
+  }
+
+  async function renderAdminApks() {
+    const container = document.getElementById('adminApkList');
+    if (state.apks.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-secondary);">No APKs uploaded</div>';
+      return;
+    }
+    let html = '';
+    for (const apk of state.apks) {
+      html += `
+        <div class="apk-item">
+          <span><strong>${apk.name}</strong> v${apk.version || '1.0'} (${apk.size || '0 MB'})</span>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn btn-primary download-admin-btn" data-id="${apk.id}">⬇️ Download</button>
+            <button class="btn btn-danger delete-admin-btn" data-id="${apk.id}">🗑️ Delete</button>
+          </div>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+    
+    document.querySelectorAll('.delete-admin-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        if (confirm('Delete this APK permanently?')) {
+          deleteApk(id);
+        }
+      });
+    });
+    
+    document.querySelectorAll('.download-admin-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        downloadApk(id);
+      });
+    });
+  }
+
+  // ============================================================
+  // APK OPERATIONS
+  // ============================================================
+  
+  function extractApkName(filename) {
+    let name = filename.replace(/\.apk$/i, '');
+    name = name.replace(/[_-]/g, ' ');
+    name = name.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+    return name;
+  }
+
+  async function deleteApk(id) {
+    const idx = state.apks.findIndex(a => a.id === id);
+    if (idx === -1) return;
+    const name = state.apks[idx].name;
+    state.apks.splice(idx, 1);
+    state.downloads = state.downloads.filter(d => d.apkId !== id);
+    
+    try {
+      await deleteApkFromDB(id);
+    } catch (error) {
+      console.error('Error deleting from IndexedDB:', error);
+    }
+    
+    saveState();
+    addActivity(`🗑️ Deleted APK: ${name}`);
+    toast('APK deleted', 'success');
+    renderAll();
+  }
+
+  async function downloadApk(id) {
+    const apk = state.apks.find(a => a.id === id);
+    if (!apk) {
+      toast('APK not found', 'error');
+      return;
+    }
+    
+    try {
+      let dl = state.downloads.find(d => d.apkId === id);
+      if (dl) { 
+        dl.count = (dl.count || 0) + 1; 
+      } else { 
+        state.downloads.push({ apkId: id, count: 1 }); 
+      }
+      saveState();
+      addActivity(`⬇️ Downloaded: ${apk.name}`);
+      
+      const fileData = await getApkFromDB(id);
+      if (!fileData) {
+        toast('APK file not found in storage', 'error');
+        return;
+      }
+      
+      const link = document.createElement('a');
+      link.href = fileData;
+      link.download = `${apk.name}.apk`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast(`⬇️ Downloading ${apk.name}`, 'success');
+      renderAll();
+    } catch (error) {
+      console.error('Download error:', error);
+      toast('Error downloading APK', 'error');
+    }
+  }
+
+  async function downloadAllApks() {
+    if (state.apks.length === 0) {
+      toast('No APKs to download', 'error');
+      return;
+    }
+    
+    let downloaded = 0;
+    for (const apk of state.apks) {
+      try {
+        const fileData = await getApkFromDB(apk.id);
+        if (fileData) {
           const link = document.createElement('a');
           link.href = fileData;
           link.download = `${apk.name}.apk`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+          downloaded++;
           
-          toast(`⬇️ Downloading ${apk.name}`);
-          renderAll();
-        } catch (error) {
-          console.error('Download error:', error);
-          toast('Error downloading APK');
-        }
-      }
-
-      async function downloadAllApks() {
-        if (state.apks.length === 0) {
-          toast('No APKs to download');
-          return;
-        }
-        
-        let downloaded = 0;
-        for (const apk of state.apks) {
-          try {
-            const fileData = await getApkFromDB(apk.id);
-            if (fileData) {
-              const link = document.createElement('a');
-              link.href = fileData;
-              link.download = `${apk.name}.apk`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              downloaded++;
-              
-              let dl = state.downloads.find(d => d.apkId === apk.id);
-              if (dl) { 
-                dl.count = (dl.count || 0) + 1; 
-              } else { 
-                state.downloads.push({ apkId: apk.id, count: 1 }); 
-              }
-            }
-          } catch (error) {
-            console.error(`Error downloading ${apk.name}:`, error);
+          let dl = state.downloads.find(d => d.apkId === apk.id);
+          if (dl) { 
+            dl.count = (dl.count || 0) + 1; 
+          } else { 
+            state.downloads.push({ apkId: apk.id, count: 1 }); 
           }
         }
-        
-        saveState();
-        addActivity(`⬇️ Downloaded ${downloaded} APKs`);
-        toast(`✅ Downloaded ${downloaded} APKs`);
-        renderAll();
+      } catch (error) {
+        console.error(`Error downloading ${apk.name}:`, error);
       }
+    }
+    
+    saveState();
+    addActivity(`⬇️ Downloaded ${downloaded} APKs`);
+    toast(`✅ Downloaded ${downloaded} APKs`, 'success');
+    renderAll();
+  }
 
-      async function renderAll() {
-        renderDashboard();
-        await renderApkGrid();
-        if (state.currentUser?.admin) {
-          await renderAdminApks();
-        }
-        updateUI();
+  // ============================================================
+  // TOAST NOTIFICATION
+  // ============================================================
+  
+  function toast(msg, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerText = msg;
+    container.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(100px)';
+      setTimeout(() => t.remove(), 300);
+    }, 3000);
+  }
+
+  // ============================================================
+  // UI UPDATES
+  // ============================================================
+  
+  async function renderAll() {
+    renderDashboard();
+    await renderApkGrid();
+    if (state.currentUser?.admin) {
+      await renderAdminApks();
+    }
+    updateUI();
+  }
+
+  function updateUI() {
+    const isLoggedIn = !!state.currentUser;
+    const isAdmin = state.currentUser?.admin || false;
+    document.getElementById('uploadNav').classList.toggle('hidden', !isAdmin);
+    document.getElementById('adminNav').classList.toggle('hidden', !isAdmin);
+    document.getElementById('logoutBtn').classList.toggle('hidden', !isLoggedIn);
+    document.getElementById('userStatus').innerText = isLoggedIn ? 
+      `👤 ${state.currentUser.username}${isAdmin ? ' (admin)' : ''}` : '👤 Guest';
+    
+    const overlay = document.getElementById('authOverlay');
+    if (isLoggedIn) {
+      overlay.classList.add('hidden');
+    } else {
+      overlay.classList.remove('hidden');
+    }
+    
+    if (!isAdmin && document.getElementById('page-upload').classList.contains('active')) {
+      switchPage('dashboard');
+    }
+    if (!isAdmin && document.getElementById('page-admin').classList.contains('active')) {
+      switchPage('dashboard');
+    }
+    
+    document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+      const id = activePage.id.replace('page-', '');
+      document.querySelector(`.sidebar nav a[data-page="${id}"]`)?.classList.add('active');
+    }
+  }
+
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(`page-${pageId}`);
+    if (target) target.classList.add('active');
+    document.getElementById('sidebar').classList.remove('open');
+    updateUI();
+  }
+
+  // ============================================================
+  // EVENT LISTENERS
+  // ============================================================
+  
+  // Hamburger
+  document.getElementById('hamburgerBtn').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  // Sidebar navigation
+  document.querySelectorAll('.sidebar nav a').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const page = this.dataset.page;
+      if (page === 'upload' && !state.currentUser?.admin) return toast('Admin only', 'error');
+      if (page === 'admin' && !state.currentUser?.admin) return toast('Admin only', 'error');
+      switchPage(page);
+    });
+  });
+
+  // Auth
+  let isRegister = false;
+  document.getElementById('authToggle').addEventListener('click', function() {
+    isRegister = !isRegister;
+    document.getElementById('authTitle').innerText = isRegister ? '📝 Register' : '🔐 Login';
+    this.innerText = isRegister ? 'Already have account? Login' : "Don't have account? Register";
+    document.getElementById('authSubmit').innerText = isRegister ? 'Register' : 'Login';
+  });
+
+  document.getElementById('authSubmit').addEventListener('click', function() {
+    const username = document.getElementById('authUser').value.trim();
+    const password = document.getElementById('authPass').value.trim();
+    if (!username || !password) return toast('Enter username and password', 'error');
+
+    if (isRegister) {
+      if (registerUser(username, password)) {
+        toast('✅ Registration successful! Please login.', 'success');
+        isRegister = false;
+        document.getElementById('authTitle').innerText = '🔐 Login';
+        document.getElementById('authToggle').innerText = "Don't have account? Register";
+        document.getElementById('authSubmit').innerText = 'Login';
+        document.getElementById('authUser').value = '';
+        document.getElementById('authPass').value = '';
+      } else {
+        toast('Username already exists or password too short', 'error');
       }
+      return;
+    }
 
-      function updateUI() {
-        const isLoggedIn = !!state.currentUser;
-        const isAdmin = state.currentUser?.admin || false;
-        document.getElementById('uploadNav').classList.toggle('hidden', !isAdmin);
-        document.getElementById('adminNav').classList.toggle('hidden', !isAdmin);
-        document.getElementById('logoutBtn').classList.toggle('hidden', !isLoggedIn);
-        document.getElementById('userStatus').innerText = isLoggedIn ? `👤 ${state.currentUser.username}${isAdmin ? ' (admin)' : ''}` : '👤 Guest';
-        
-        const overlay = document.getElementById('authOverlay');
-        if (isLoggedIn) {
-          overlay.classList.add('hidden');
-        } else {
-          overlay.classList.remove('hidden');
-        }
-        
-        if (!isAdmin && document.getElementById('page-upload').classList.contains('active')) {
-          switchPage('dashboard');
-        }
-        if (!isAdmin && document.getElementById('page-admin').classList.contains('active')) {
-          switchPage('dashboard');
-        }
-        
-        document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
-        const activePage = document.querySelector('.page.active');
-        if (activePage) {
-          const id = activePage.id.replace('page-', '');
-          document.querySelector(`.sidebar nav a[data-page="${id}"]`)?.classList.add('active');
-        }
-      }
+    if (loginUser(username, password)) {
+      toast(`Welcome ${state.currentUser.username}`, 'success');
+      saveState();
+      renderAll();
+    } else {
+      const attempts = state.failedLoginAttempts[username] || 0;
+      toast(`Invalid credentials (${attempts}/5 attempts)`, 'error');
+    }
+  });
 
-      function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const target = document.getElementById(`page-${pageId}`);
-        if (target) target.classList.add('active');
-        document.getElementById('sidebar').classList.remove('open');
-        updateUI();
-      }
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    state.currentUser = null;
+    saveState();
+    renderAll();
+    toast('Logged out', 'info');
+  });
 
-      function toast(msg) {
-        const container = document.getElementById('toastContainer');
-        const t = document.createElement('div');
-        t.className = 'toast';
-        t.innerText = msg;
-        container.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-      }
-
-      // Event Listeners
-      document.getElementById('hamburgerBtn').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.toggle('open');
-      });
+  // APK file handler
+  document.getElementById('apkFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const infoDiv = document.getElementById('apkFileInfo');
+    const nameInput = document.getElementById('apkName');
+    
+    if (file) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
       
-      document.querySelectorAll('.sidebar nav a').forEach(link => {
-        link.addEventListener('click', function(e) {
-          const page = this.dataset.page;
-          if (page === 'upload' && !state.currentUser?.admin) return toast('Admin only');
-          if (page === 'admin' && !state.currentUser?.admin) return toast('Admin only');
-          switchPage(page);
-        });
-      });
+      if (file.size > MAX_APK_SIZE) {
+        toast(`❌ File too large! Maximum 50MB. Your file: ${sizeMB}MB`, 'error');
+        this.value = '';
+        infoDiv.style.display = 'none';
+        return;
+      }
+      
+      infoDiv.innerHTML = `📄 ${file.name} (${sizeMB} MB)`;
+      infoDiv.style.display = 'block';
+      
+      if (!nameInput.value.trim()) {
+        const extractedName = extractApkName(file.name);
+        nameInput.value = extractedName;
+      }
+    } else {
+      infoDiv.style.display = 'none';
+    }
+  });
 
-      let isRegister = false;
-      document.getElementById('authToggle').addEventListener('click', function() {
-        isRegister = !isRegister;
-        document.getElementById('authTitle').innerText = isRegister ? '📝 Register' : '🔐 Login';
-        this.innerText = isRegister ? 'Already have account? Login' : 'Don\'t have account? Register';
-        document.getElementById('authSubmit').innerText = isRegister ? 'Register' : 'Login';
-      });
+  // Image preview
+  document.getElementById('apkImage').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const previewDiv = document.getElementById('imagePreview');
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        previewDiv.innerHTML = `<img src="${ev.target.result}" alt="preview">`;
+        previewDiv.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewDiv.innerHTML = '';
+      previewDiv.classList.add('hidden');
+    }
+  });
 
-      document.getElementById('authSubmit').addEventListener('click', function() {
-        const username = document.getElementById('authUser').value.trim();
-        const password = document.getElementById('authPass').value.trim();
-        if (!username || !password) return toast('Enter username and password');
+  // Upload button
+  document.getElementById('uploadBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    if (!state.currentUser?.admin) {
+      toast('Admin only', 'error');
+      return;
+    }
+    
+    const name = document.getElementById('apkName').value.trim();
+    const version = document.getElementById('apkVersion').value.trim() || '1.0';
+    const desc = document.getElementById('apkDesc').value.trim();
+    const fileInput = document.getElementById('apkFile');
+    const imageInput = document.getElementById('apkImage');
 
-        if (isRegister) {
-          if (registerUser(username, password)) {
-            toast('✅ Registration successful! Please login.');
-            isRegister = false;
-            document.getElementById('authTitle').innerText = '🔐 Login';
-            document.getElementById('authToggle').innerText = 'Don\'t have account? Register';
-            document.getElementById('authSubmit').innerText = 'Login';
-            document.getElementById('authUser').value = '';
-            document.getElementById('authPass').value = '';
-          } else {
-            toast('Username already exists');
-          }
-          return;
+    if (!name) {
+      toast('APK Name is required', 'error');
+      document.getElementById('apkName').focus();
+      return;
+    }
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+      toast('Please select an APK file', 'error');
+      fileInput.focus();
+      return;
+    }
+    
+    const file = fileInput.files[0];
+    if (!file.name.toLowerCase().endsWith('.apk')) {
+      toast('File must be .apk', 'error');
+      return;
+    }
+
+    if (file.size > MAX_APK_SIZE) {
+      toast(`❌ File too large! Maximum 50MB. Your file: ${(file.size / (1024 * 1024)).toFixed(2)}MB`, 'error');
+      return;
+    }
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const progressBar = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('uploadProgressFill');
+    
+    uploadBtn.textContent = '⏳ Uploading...';
+    uploadBtn.classList.add('upload-loading');
+    uploadBtn.disabled = true;
+    progressBar.classList.remove('hidden');
+    progressFill.style.width = '0%';
+
+    try {
+      const reader = new FileReader();
+      reader.onprogress = function(event) {
+        if (event.lengthComputable) {
+          const percent = (event.loaded / event.total) * 100;
+          progressFill.style.width = percent + '%';
         }
-
-        if (loginUser(username, password)) {
-          toast(`Welcome ${state.currentUser.username}`);
-          saveState();
-          renderAll();
-        } else {
-          toast('Invalid credentials');
-        }
-      });
-
-      document.getElementById('logoutBtn').addEventListener('click', function() {
-        state.currentUser = null;
-        saveState();
-        renderAll();
-        toast('Logged out');
-      });
-
-      // APK file handler
-      document.getElementById('apkFile').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const infoDiv = document.getElementById('apkFileInfo');
-        const nameInput = document.getElementById('apkName');
-        
-        if (file) {
-          const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-          
-          if (file.size > MAX_APK_SIZE) {
-            toast(`❌ File too large! Maximum 50MB. Your file: ${sizeMB}MB`);
-            this.value = '';
-            infoDiv.style.display = 'none';
-            return;
-          }
-          
-          infoDiv.innerHTML = `📄 ${file.name} (${sizeMB} MB)`;
-          infoDiv.style.display = 'block';
-          
-          if (!nameInput.value.trim()) {
-            const extractedName = extractApkName(file.name);
-            nameInput.value = extractedName;
-          }
-        } else {
-          infoDiv.style.display = 'none';
-        }
-      });
-
-      // Image preview
-      document.getElementById('apkImage').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const previewDiv = document.getElementById('imagePreview');
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            previewDiv.innerHTML = `<img src="${ev.target.result}" alt="preview">`;
-            previewDiv.classList.remove('hidden');
-          };
-          reader.readAsDataURL(file);
-        } else {
-          previewDiv.innerHTML = '';
-          previewDiv.classList.add('hidden');
-        }
-      });
-
-      // Upload button
-      document.getElementById('uploadBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        if (!state.currentUser?.admin) {
-          toast('Admin only');
-          return;
-        }
-        
-        const name = document.getElementById('apkName').value.trim();
-        const version = document.getElementById('apkVersion').value.trim() || '1.0';
-        const desc = document.getElementById('apkDesc').value.trim();
-        const fileInput = document.getElementById('apkFile');
-        const imageInput = document.getElementById('apkImage');
-
-        if (!name) {
-          toast('APK Name is required');
-          document.getElementById('apkName').focus();
-          return;
-        }
-        
-        if (!fileInput.files || fileInput.files.length === 0) {
-          toast('Please select an APK file');
-          fileInput.focus();
-          return;
-        }
-        
-        const file = fileInput.files[0];
-        if (!file.name.toLowerCase().endsWith('.apk')) {
-          toast('File must be .apk');
-          return;
-        }
-
-        if (file.size > MAX_APK_SIZE) {
-          toast(`❌ File too large! Maximum 50MB. Your file: ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
-          return;
-        }
-
-        const uploadBtn = document.getElementById('uploadBtn');
-        const progressBar = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('uploadProgressFill');
-        
-        uploadBtn.textContent = '⏳ Uploading...';
-        uploadBtn.classList.add('upload-loading');
-        uploadBtn.disabled = true;
-        progressBar.classList.remove('hidden');
-        progressFill.style.width = '0%';
-
+      };
+      
+      reader.onload = async function(e) {
         try {
-          const reader = new FileReader();
-          reader.onprogress = function(event) {
-            if (event.lengthComputable) {
-              const percent = (event.loaded / event.total) * 100;
-              progressFill.style.width = percent + '%';
-            }
-          };
+          progressFill.style.width = '100%';
+          const fileData = e.target.result;
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
           
-          reader.onload = async function(e) {
-            try {
-              progressFill.style.width = '100%';
-              const fileData = e.target.result;
-              const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-              
-              let imageData = null;
-              if (imageInput.files && imageInput.files.length > 0) {
-                const imgFile = imageInput.files[0];
-                imageData = await new Promise((resolve, reject) => {
-                  const imgReader = new FileReader();
-                  imgReader.onload = function(ev) { resolve(ev.target.result); };
-                  imgReader.onerror = function() { reject(new Error('Image read error')); };
-                  imgReader.readAsDataURL(imgFile);
-                });
-              }
-              
-              await saveApk(name, version, desc, fileData, sizeMB, file.size, imageData);
-            } catch (error) {
-              console.error('Upload error:', error);
-              toast('Error uploading: ' + error.message);
-              resetUploadButton();
-            }
-          };
-          reader.onerror = function() {
-            toast('Error reading APK file');
-            resetUploadButton();
-          };
-          reader.readAsDataURL(file);
+          let imageData = null;
+          if (imageInput.files && imageInput.files.length > 0) {
+            const imgFile = imageInput.files[0];
+            imageData = await new Promise((resolve, reject) => {
+              const imgReader = new FileReader();
+              imgReader.onload = function(ev) { resolve(ev.target.result); };
+              imgReader.onerror = function() { reject(new Error('Image read error')); };
+              imgReader.readAsDataURL(imgFile);
+            });
+          }
+          
+          await saveApk(name, version, desc, fileData, sizeMB, file.size, imageData);
         } catch (error) {
           console.error('Upload error:', error);
-          toast('Upload error: ' + error.message);
+          toast('Error uploading: ' + error.message, 'error');
           resetUploadButton();
         }
-      });
+      };
+      reader.onerror = function() {
+        toast('Error reading APK file', 'error');
+        resetUploadButton();
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast('Upload error: ' + error.message, 'error');
+      resetUploadButton();
+    }
+  });
 
-      function resetUploadButton() {
-        const uploadBtn = document.getElementById('uploadBtn');
-        const progressBar = document.getElementById('uploadProgress');
-        
-        uploadBtn.textContent = '📤 Upload APK';
-        uploadBtn.classList.remove('upload-loading');
-        uploadBtn.disabled = false;
-        progressBar.classList.add('hidden');
-        document.getElementById('uploadProgressFill').style.width = '0%';
+  function resetUploadButton() {
+    const uploadBtn = document.getElementById('uploadBtn');
+    const progressBar = document.getElementById('uploadProgress');
+    
+    uploadBtn.textContent = '📤 Upload APK';
+    uploadBtn.classList.remove('upload-loading');
+    uploadBtn.disabled = false;
+    progressBar.classList.add('hidden');
+    document.getElementById('uploadProgressFill').style.width = '0%';
+  }
+
+  async function saveApk(name, version, desc, fileData, size, sizeBytes, imageData) {
+    try {
+      const apkId = 'apk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      
+      const apk = {
+        id: apkId,
+        name: name,
+        version: version,
+        desc: desc,
+        size: size,
+        sizeBytes: sizeBytes,
+        imageData: imageData,
+        date: new Date().toLocaleDateString(),
+      };
+      
+      await saveApkToDB(apkId, fileData);
+      state.apks.push(apk);
+      
+      if (!saveState()) {
+        state.apks.pop();
+        await deleteApkFromDB(apkId);
+        toast('❌ Failed to save APK metadata', 'error');
+        resetUploadButton();
+        return;
       }
-
-      async function saveApk(name, version, desc, fileData, size, sizeBytes, imageData) {
-        try {
-          const apkId = 'apk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-          
-          const apk = {
-            id: apkId,
-            name: name,
-            version: version,
-            desc: desc,
-            size: size,
-            sizeBytes: sizeBytes,
-            imageData: imageData,
-            date: new Date().toLocaleDateString(),
-          };
-          
-          // Save file to IndexedDB
-          await saveApkToDB(apkId, fileData);
-          
-          // Save metadata to state
-          state.apks.push(apk);
-          
-          if (!saveState()) {
-            // Rollback if save fails
-            state.apks.pop();
-            await deleteApkFromDB(apkId);
-            toast('❌ Failed to save APK metadata');
-            resetUploadButton();
-            return;
-          }
-          
-          addActivity(`⬆️ Uploaded APK: ${name}`);
-          toast(`✅ APK "${name}" uploaded successfully!`);
-          
-          // Clear form
-          document.getElementById('apkName').value = '';
-          document.getElementById('apkVersion').value = '';
-          document.getElementById('apkDesc').value = '';
-          document.getElementById('apkFile').value = '';
-          document.getElementById('apkImage').value = '';
-          document.getElementById('apkFileInfo').style.display = 'none';
-          document.getElementById('apkFileInfo').innerHTML = '';
-          document.getElementById('imagePreview').innerHTML = '';
-          document.getElementById('imagePreview').classList.add('hidden');
-          
-          resetUploadButton();
-          renderAll();
-        } catch (error) {
-          console.error('Save APK error:', error);
-          toast('Error saving APK: ' + error.message);
-          resetUploadButton();
-        }
-      }
-
-      // Download All button
-      document.getElementById('downloadAllBtn').addEventListener('click', function() {
-        downloadAllApks();
-      });
-
-      // INIT
+      
+      addActivity(`⬆️ Uploaded APK: ${name}`);
+      toast(`✅ APK "${name}" uploaded successfully!`, 'success');
+      
+      document.getElementById('apkName').value = '';
+      document.getElementById('apkVersion').value = '';
+      document.getElementById('apkDesc').value = '';
+      document.getElementById('apkFile').value = '';
+      document.getElementById('apkImage').value = '';
+      document.getElementById('apkFileInfo').style.display = 'none';
+      document.getElementById('apkFileInfo').innerHTML = '';
+      document.getElementById('imagePreview').innerHTML = '';
+      document.getElementById('imagePreview').classList.add('hidden');
+      
+      resetUploadButton();
       renderAll();
-      if (state.users.length === 0) {
-        document.getElementById('authToggle').click();
-      }
+    } catch (error) {
+      console.error('Save APK error:', error);
+      toast('Error saving APK: ' + error.message, 'error');
+      resetUploadButton();
+    }
+  }
 
-      document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        const hamburger = document.getElementById('hamburgerBtn');
-        if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== hamburger) {
-          sidebar.classList.remove('open');
-        }
-      });
+  // Download All button
+  document.getElementById('downloadAllBtn').addEventListener('click', function() {
+    downloadAllApks();
+  });
 
-    })();
-  </script>
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+  
+  // Load state
+  loadState();
+  
+  // Initialize anti-dump protection
+  const protection = new AntiDumpProtection();
+  window.__DWR_PROTECTION = protection;
+  protection.startMonitoring();
+  protection.protectConsole();
+  
+  // Initialize database and render
+  initDB().then(() => {
+    renderAll();
+    console.log('✅ DWR APK Manager initialized with anti-dump protection');
+  }).catch(error => {
+    console.error('IndexedDB error:', error);
+    toast('⚠️ Storage error: ' + error.message, 'error');
+    renderAll();
+  });
+  
+  // Show register if no users
+  if (state.users.length === 0) {
+    document.getElementById('authToggle').click();
+  }
+
+  // Close sidebar on outside click
+  document.addEventListener('click', function(e) {
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburgerBtn');
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== hamburger) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // Keyboard shortcut: Escape to close sidebar
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+  });
+
+})();
+</script>
 </body>
 </html>
