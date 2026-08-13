@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>DWR APK Manager v4.0</title>
+  <title>DWR APK Manager v5.0 - Bot Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
@@ -27,545 +27,242 @@
       --gradient-end: #4f46e5;
       --danger: #f472b6;
       --success: #34d399;
+      --warning: #fbbf24;
       --sidebar-width: 260px;
     }
-    body { 
-      background: var(--bg-primary); 
-      color: var(--text-primary); 
-      min-height: 100vh; 
-      display: flex; 
-      overflow-x: hidden;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; overflow-x: hidden; }
     
     .sidebar {
-      position: fixed; 
-      top: 0; 
-      left: calc(-1 * var(--sidebar-width)); 
-      width: var(--sidebar-width); 
-      height: 100%;
-      background: var(--bg-secondary); 
-      border-right: 1px solid var(--border-color);
-      padding: 1.5rem 1rem; 
-      transition: left 0.25s ease;
-      z-index: 1000; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 1.5rem;
-      box-shadow: 4px 0 30px rgba(0,0,0,0.6); 
-      overflow-y: auto;
+      position: fixed; top: 0; left: calc(-1 * var(--sidebar-width)); width: var(--sidebar-width); height: 100%;
+      background: var(--bg-secondary); border-right: 1px solid var(--border-color);
+      padding: 1.5rem 1rem; transition: left 0.25s ease; z-index: 1000; display: flex; flex-direction: column; gap: 1.5rem;
+      box-shadow: 4px 0 30px rgba(0,0,0,0.6); overflow-y: auto;
     }
     .sidebar::-webkit-scrollbar { width: 3px; }
     .sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
     .sidebar.open { left: 0; }
     
     .sidebar-brand {
-      font-size: 1.3rem; 
-      font-weight: 700;
+      font-size: 1.3rem; font-weight: 700;
       background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      -webkit-background-clip: text; 
-      -webkit-text-fill-color: transparent;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--border-color);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color);
       flex-shrink: 0;
     }
-    .sidebar nav { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 0.2rem; 
-      flex: 1;
-    }
+    .sidebar nav { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; }
     .sidebar nav a {
-      color: var(--text-secondary); 
-      text-decoration: none; 
-      padding: 0.6rem 0.8rem;
-      border-radius: 8px; 
-      transition: background 0.15s, color 0.15s;
-      font-weight: 500; 
-      cursor: pointer;
-      display: flex; 
-      align-items: center; 
-      gap: 0.7rem; 
-      font-size: 0.85rem;
+      color: var(--text-secondary); text-decoration: none; padding: 0.6rem 0.8rem;
+      border-radius: 8px; transition: background 0.15s, color 0.15s;
+      font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.7rem; font-size: 0.85rem;
     }
-    .sidebar nav a:hover, .sidebar nav a.active {
-      background: var(--bg-card); 
-      color: var(--text-primary);
-    }
-    .sidebar-footer { 
-      margin-top: auto; 
-      border-top: 1px solid var(--border-color); 
-      padding-top: 1rem; 
-      flex-shrink: 0;
-    }
+    .sidebar nav a:hover, .sidebar nav a.active { background: var(--bg-card); color: var(--text-primary); }
+    .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 1rem; flex-shrink: 0; }
     .logout-btn {
-      background: #3b1f2e; 
-      color: var(--danger); 
-      border: none; 
-      padding: 0.5rem 1rem;
-      border-radius: 40px; 
-      width: 100%; 
-      font-weight: 600; 
-      cursor: pointer;
-      transition: background 0.15s;
-      font-size: 0.8rem;
+      background: #3b1f2e; color: var(--danger); border: none; padding: 0.5rem 1rem;
+      border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; font-size: 0.8rem;
     }
     .logout-btn:hover { background: #5a2a40; }
     
     .hamburger {
-      position: fixed; 
-      top: 0.8rem; 
-      left: 0.8rem; 
-      z-index: 1100;
-      background: var(--bg-secondary); 
-      border: 1px solid var(--border-color);
-      color: white; 
-      font-size: 1.5rem; 
-      padding: 0.1rem 0.6rem;
-      border-radius: 8px; 
-      cursor: pointer; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      transition: background 0.15s;
-      line-height: 1.3;
+      position: fixed; top: 0.8rem; left: 0.8rem; z-index: 1100;
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      color: white; font-size: 1.5rem; padding: 0.1rem 0.6rem;
+      border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: background 0.15s; line-height: 1.3;
     }
     .hamburger:hover { background: var(--bg-card); }
     
     .sidebar-overlay {
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      right: 0; 
-      bottom: 0;
-      background: rgba(0,0,0,0.4); 
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
     }
-    .sidebar-overlay.active { 
-      opacity: 1; 
-      pointer-events: all; 
-    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: all; }
     
     .main {
-      flex: 1; 
-      padding: 1.2rem; 
-      max-width: 1400px; 
-      margin: 0 auto; 
-      width: 100%;
-      padding-top: 3.5rem;
+      flex: 1; padding: 1.2rem; max-width: 1400px; margin: 0 auto; width: 100%; padding-top: 3.5rem;
     }
     .page { display: none; }
     .page.active { display: block; }
     
     .stats-grid {
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.8rem; 
-      margin-bottom: 1.2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem; margin-bottom: 1.2rem;
     }
     .stat-card {
-      background: var(--bg-secondary); 
-      border-radius: 16px; 
-      padding: 0.8rem 1rem;
-      border: 1px solid var(--border-color); 
+      background: var(--bg-secondary); border-radius: 16px; padding: 0.8rem 1rem;
+      border: 1px solid var(--border-color);
     }
-    .stat-card h3 { 
-      font-weight: 400; 
-      font-size: 0.65rem; 
-      color: var(--text-secondary); 
-      text-transform: uppercase; 
-      letter-spacing: 0.3px; 
-    }
+    .stat-card h3 { font-weight: 400; font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; }
     .stat-card .number {
-      font-size: 1.5rem; 
-      font-weight: 700; 
-      margin-top: 0.1rem;
+      font-size: 1.5rem; font-weight: 700; margin-top: 0.1rem;
       background: linear-gradient(135deg, #c4b5fd, #818cf8);
-      -webkit-background-clip: text; 
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     
     .apk-grid {
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1.2rem; 
-      margin-top: 1rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.2rem; margin-top: 1rem;
     }
     .apk-card {
-      background: var(--bg-secondary); 
-      border-radius: 20px; 
-      padding: 0.8rem 0.8rem 1rem;
-      border: 1px solid var(--border-color); 
-      transition: border-color 0.15s, transform 0.15s;
-      display: flex; 
-      flex-direction: column;
+      background: var(--bg-secondary); border-radius: 20px; padding: 0.8rem 0.8rem 1rem;
+      border: 1px solid var(--border-color); transition: border-color 0.15s, transform 0.15s;
+      display: flex; flex-direction: column;
     }
-    .apk-card:hover {
-      transform: translateY(-3px); 
-      border-color: var(--gradient-start);
-    }
+    .apk-card:hover { transform: translateY(-3px); border-color: var(--gradient-start); }
     .apk-card .icon-wrap {
-      width: 100%; 
-      aspect-ratio: 1/1; 
-      background: var(--bg-card);
-      border-radius: 14px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      overflow: hidden; 
-      margin-bottom: 0.5rem; 
-      border: 1px solid var(--border-color);
-      position: relative;
+      width: 100%; aspect-ratio: 1/1; background: var(--bg-card);
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; margin-bottom: 0.5rem; border: 1px solid var(--border-color); position: relative;
     }
     .apk-card .icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .apk-card .icon-wrap video { 
-      width: 100%; height: 100%; object-fit: cover; 
-      position: absolute; top: 0; left: 0;
-    }
+    .apk-card .icon-wrap video { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
     .apk-card .icon-wrap .fallback { font-size: 2.5rem; opacity: 0.3; }
     .apk-card .icon-wrap .media-badge {
-      position: absolute; 
-      bottom: 4px; 
-      right: 4px;
-      background: rgba(0,0,0,0.7); 
-      color: white;
-      padding: 1px 6px; 
-      border-radius: 20px;
-      font-size: 0.5rem; 
-      font-weight: 600;
-      backdrop-filter: blur(4px);
+      position: absolute; bottom: 4px; right: 4px;
+      background: rgba(0,0,0,0.7); color: white; padding: 1px 6px; border-radius: 20px;
+      font-size: 0.5rem; font-weight: 600; backdrop-filter: blur(4px);
     }
     .apk-name { font-weight: 700; font-size: 0.95rem; margin: 0.1rem 0; }
     .apk-version { color: var(--text-secondary); font-size: 0.75rem; }
-    .apk-desc { 
-      color: #bcbcd6; 
-      font-size: 0.8rem; 
-      margin: 0.2rem 0; 
-      flex: 1;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .apk-meta {
-      display: flex; 
-      justify-content: space-between; 
-      font-size: 0.65rem;
-      color: var(--text-secondary); 
-      border-top: 1px solid var(--border-color);
-      padding-top: 0.3rem; 
-      margin-top: 0.3rem;
-    }
-    .apk-meta .file-type {
-      background: var(--bg-card);
-      padding: 0.1rem 0.4rem;
-      border-radius: 4px;
-      font-size: 0.6rem;
-      font-weight: 600;
-    }
+    .apk-desc { color: #bcbcd6; font-size: 0.8rem; margin: 0.2rem 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .apk-meta { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-secondary); border-top: 1px solid var(--border-color); padding-top: 0.3rem; margin-top: 0.3rem; }
+    .apk-meta .file-type { background: var(--bg-card); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.6rem; font-weight: 600; }
     .apk-meta .file-type.apk { color: var(--success); }
-    .apk-meta .file-type.zip { color: #fbbf24; }
-    .apk-meta .file-type.bypass { color: #f472b6; }
+    .apk-meta .file-type.zip { color: var(--warning); }
+    .apk-meta .file-type.bypass { color: var(--danger); }
     
     .btn-group { display: flex; gap: 0.3rem; margin-top: 0.4rem; flex-wrap: wrap; }
     
     .btn {
-      background: var(--bg-card); 
-      border: 1px solid var(--border-color);
-      color: white; 
-      padding: 0.3rem 0.8rem; 
-      border-radius: 40px;
-      font-weight: 600; 
-      font-size: 0.7rem; 
-      cursor: pointer;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: white; padding: 0.3rem 0.8rem; border-radius: 40px;
+      font-weight: 600; font-size: 0.7rem; cursor: pointer;
       transition: background 0.15s, transform 0.1s;
-      flex: 1 1 auto; 
-      text-align: center;
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 0.2rem;
+      flex: 1 1 auto; text-align: center;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.2rem;
     }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      border: none; 
-      color: white;
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border: none; color: white; }
     .btn-primary:active { transform: scale(0.95); }
     .btn-danger { background: #4a1f2e; color: var(--danger); border-color: #6a2a42; }
     .btn-danger:active { transform: scale(0.95); }
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #10b981);
-      border: none; 
-      color: white;
-    }
+    .btn-success { background: linear-gradient(135deg, var(--success), #10b981); border: none; color: white; }
     .btn-success:active { transform: scale(0.95); }
-    .btn-bypass {
-      background: linear-gradient(135deg, #f472b6, #ec4899);
-      border: none; 
-      color: white;
-    }
-    .btn-bypass:active { transform: scale(0.95); }
     
     .card-form {
-      background: var(--bg-secondary); 
-      border-radius: 20px; 
-      padding: 1.2rem;
-      border: 1px solid var(--border-color); 
-      max-width: 650px; 
-      margin: 0.5rem 0;
+      background: var(--bg-secondary); border-radius: 20px; padding: 1.2rem;
+      border: 1px solid var(--border-color); max-width: 650px; margin: 0.5rem 0;
     }
-    .card-form input, 
-    .card-form textarea, 
-    .card-form select {
-      width: 100%; 
-      background: var(--bg-card); 
-      border: 1px solid var(--border-color);
-      color: white; 
-      padding: 0.6rem 0.8rem; 
-      border-radius: 14px;
-      margin-bottom: 0.6rem; 
-      font-size: 0.9rem; 
-      outline: none;
-      transition: border-color 0.15s;
-      -webkit-appearance: none;
-      appearance: none;
+    .card-form input, .card-form textarea, .card-form select {
+      width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+      color: white; padding: 0.6rem 0.8rem; border-radius: 14px;
+      margin-bottom: 0.6rem; font-size: 0.9rem; outline: none; transition: border-color 0.15s;
+      -webkit-appearance: none; appearance: none;
     }
-    .card-form input:focus, 
-    .card-form textarea:focus, 
-    .card-form select:focus {
-      border-color: var(--gradient-start);
-    }
-    .card-form textarea {
-      resize: vertical;
-      min-height: 40px;
-      max-height: 100px;
-    }
-    .card-form input[type="file"] { 
-      padding: 0.3rem; 
-      background: var(--bg-card); 
-      font-size: 0.8rem;
-    }
-    .card-form label { 
-      font-weight: 500; 
-      color: var(--text-secondary); 
-      display: block; 
-      margin-bottom: 0.1rem; 
-      font-size: 0.8rem;
-    }
+    .card-form input:focus, .card-form textarea:focus, .card-form select:focus { border-color: var(--gradient-start); }
+    .card-form textarea { resize: vertical; min-height: 40px; max-height: 100px; }
+    .card-form input[type="file"] { padding: 0.3rem; background: var(--bg-card); font-size: 0.8rem; }
+    .card-form label { font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.1rem; font-size: 0.8rem; }
     .card-form .admin-only-badge {
-      display: inline-block;
-      background: #4a1f2e;
-      color: var(--danger);
-      padding: 0.1rem 0.6rem;
-      border-radius: 20px;
-      font-size: 0.6rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
+      display: inline-block; background: #4a1f2e; color: var(--danger);
+      padding: 0.1rem 0.6rem; border-radius: 20px; font-size: 0.6rem; font-weight: 600; margin-left: 0.5rem;
     }
     
     .toast-container {
-      position: fixed; 
-      bottom: 1rem; 
-      right: 1rem; 
-      z-index: 9999;
-      display: flex; 
-      flex-direction: column; 
-      gap: 0.4rem;
-      pointer-events: none;
+      position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;
+      display: flex; flex-direction: column; gap: 0.4rem; pointer-events: none;
     }
     .toast {
-      background: var(--bg-secondary); 
-      color: var(--text-primary);
-      padding: 0.5rem 1rem; 
-      border-radius: 40px;
+      background: var(--bg-secondary); color: var(--text-primary);
+      padding: 0.5rem 1rem; border-radius: 40px;
       border-left: 4px solid var(--gradient-start);
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      font-weight: 500; 
-      animation: slideUp 0.2s ease; 
-      min-width: 150px;
-      pointer-events: all;
-      font-size: 0.8rem;
+      font-weight: 500; animation: slideUp 0.2s ease; min-width: 150px;
+      pointer-events: all; font-size: 0.8rem;
     }
     .toast.error { border-left-color: var(--danger); }
     .toast.success { border-left-color: var(--success); }
-    .toast.warning { border-left-color: #fbbf24; }
+    .toast.warning { border-left-color: var(--warning); }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
     .auth-overlay {
-      position: fixed; 
-      inset: 0; 
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(10px); 
-      z-index: 2000;
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px); z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
     }
     .auth-overlay.hidden { display: none; }
     .auth-box {
-      background: var(--bg-secondary); 
-      padding: 1.8rem; 
-      border-radius: 32px;
-      max-width: 380px; 
-      width: 90%; 
-      border: 1px solid var(--border-color);
+      background: var(--bg-secondary); padding: 1.8rem; border-radius: 32px;
+      max-width: 420px; width: 90%; border: 1px solid var(--border-color);
       box-shadow: 0 24px 64px rgba(0,0,0,0.6);
     }
     .auth-box h2 { margin-bottom: 1rem; font-weight: 600; text-align: center; font-size: 1.2rem; }
     .auth-box input {
-      width: 100%; 
-      padding: 0.6rem 0.9rem; 
-      border-radius: 40px;
-      border: 1px solid var(--border-color); 
-      background: var(--bg-card);
-      color: white; 
-      margin-bottom: 0.6rem; 
-      font-size: 0.9rem;
-      outline: none;
+      width: 100%; padding: 0.6rem 0.9rem; border-radius: 40px;
+      border: 1px solid var(--border-color); background: var(--bg-card);
+      color: white; margin-bottom: 0.6rem; font-size: 0.9rem; outline: none;
     }
     .auth-box input:focus { border-color: var(--gradient-start); }
     .auth-box .btn { width: 100%; padding: 0.6rem; margin-top: 0.2rem; }
-    .auth-toggle { 
-      color: var(--gradient-start); 
-      cursor: pointer; 
-      text-align: center; 
-      margin-top: 0.6rem; 
-      font-size: 0.85rem;
-    }
+    .auth-toggle { color: var(--gradient-start); cursor: pointer; text-align: center; margin-top: 0.6rem; font-size: 0.85rem; }
     .auth-toggle:hover { opacity: 0.8; }
     .hidden { display: none !important; }
     
-    .progress-bar {
-      width: 100%; 
-      height: 4px; 
-      background: var(--bg-card);
-      border-radius: 10px; 
-      overflow: hidden; 
-      margin: 0.3rem 0;
+    /* Bot Login Status */
+    .bot-login-status {
+      background: var(--bg-card); border-radius: 12px; padding: 0.8rem 1rem;
+      margin-bottom: 0.8rem; border: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 0.8rem;
     }
-    .progress-bar .progress-fill {
-      height: 100%; 
-      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-      width: 0%; 
-      transition: width 0.3s ease; 
-      border-radius: 10px;
+    .bot-login-status .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
     }
+    .bot-login-status .status-dot.waiting { background: var(--warning); animation: pulse 1s infinite; }
+    .bot-login-status .status-dot.approved { background: var(--success); }
+    .bot-login-status .status-dot.rejected { background: var(--danger); }
+    .bot-login-status .status-dot.timeout { background: var(--text-secondary); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    .bot-login-status .status-text { flex: 1; font-size: 0.85rem; }
+    .bot-login-status .status-text .highlight { color: var(--gradient-start); font-weight: 600; }
     
-    .media-preview {
-      margin: 0.2rem 0 0.4rem 0; 
-      max-width: 100px; 
-      max-height: 100px;
-      border-radius: 10px; 
-      overflow: hidden; 
-      border: 1px solid var(--border-color);
-    }
+    .progress-bar { width: 100%; height: 4px; background: var(--bg-card); border-radius: 10px; overflow: hidden; margin: 0.3rem 0; }
+    .progress-bar .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); width: 0%; transition: width 0.3s ease; border-radius: 10px; }
+    
+    .media-preview { margin: 0.2rem 0 0.4rem 0; max-width: 100px; max-height: 100px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); }
     .media-preview img { width: 100%; height: 100%; object-fit: cover; }
     .media-preview video { width: 100%; height: 100%; object-fit: cover; }
-    .file-info {
-      color: var(--text-secondary); 
-      font-size: 0.75rem;
-      margin: -0.2rem 0 0.3rem 0; 
-      padding: 0.2rem 0.4rem;
-      background: var(--bg-card); 
-      border-radius: 6px;
-    }
+    .file-info { color: var(--text-secondary); font-size: 0.75rem; margin: -0.2rem 0 0.3rem 0; padding: 0.2rem 0.4rem; background: var(--bg-card); border-radius: 6px; }
     .upload-loading { opacity: 0.6; pointer-events: none; }
     .download-all-btn { margin: 0.4rem 0; }
     
     .bar-chart { margin: 0.8rem 0; }
-    .bar-item {
-      display: flex; 
-      align-items: center; 
-      gap: 0.5rem; 
-      margin-bottom: 0.2rem;
-    }
-    .bar-item span { 
-      min-width: 40px; 
-      font-size: 0.7rem; 
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .bar-track {
-      flex: 1; 
-      height: 5px; 
-      background: var(--bg-card); 
-      border-radius: 20px; 
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%; 
-      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-      border-radius: 20px; 
-      width: 0%; 
-      transition: width 0.5s ease;
-    }
-    .activity-log {
-      background: var(--bg-secondary); 
-      border-radius: 16px; 
-      padding: 0.6rem;
-      border: 1px solid var(--border-color); 
-      max-height: 160px; 
-      overflow-y: auto;
-    }
+    .bar-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+    .bar-item span { min-width: 40px; font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 5px; background: var(--bg-card); border-radius: 20px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 20px; width: 0%; transition: width 0.5s ease; }
+    .activity-log { background: var(--bg-secondary); border-radius: 16px; padding: 0.6rem; border: 1px solid var(--border-color); max-height: 160px; overflow-y: auto; }
     .activity-log::-webkit-scrollbar { width: 3px; }
     .activity-log::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-    .activity-log div {
-      padding: 0.15rem 0; 
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.75rem; 
-      color: var(--text-secondary);
-    }
+    .activity-log div { padding: 0.15rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-secondary); }
     
-    .admin-reserved-dialog {
-      background: #1a0f0f; 
-      border: 2px solid var(--danger);
-      border-radius: 12px; 
-      padding: 0.8rem 1rem;
-      margin-bottom: 0.6rem;
-      display: flex; 
-      align-items: center; 
-      gap: 0.6rem;
-    }
-    .admin-reserved-dialog .icon { font-size: 1.4rem; flex-shrink: 0; }
-    .admin-reserved-dialog .content h4 { 
-      color: var(--danger); 
-      font-size: 0.9rem;
-    }
-    .admin-reserved-dialog .content p { 
-      color: var(--text-secondary); 
-      font-size: 0.75rem; 
-    }
-    
-    .media-type-badge {
-      display: inline-block; 
-      padding: 1px 6px; 
-      border-radius: 20px;
-      font-size: 0.55rem; 
-      font-weight: 600; 
-    }
+    .media-type-badge { display: inline-block; padding: 1px 6px; border-radius: 20px; font-size: 0.55rem; font-weight: 600; }
     .media-type-badge.image { background: #1a3a2e; color: var(--success); }
     .media-type-badge.video { background: #3a1a2e; color: #f472b6; }
     .media-type-badge.none { background: #2a2a3a; color: var(--text-secondary); }
     
-    .admin-upload-warning {
-      background: #1a0f2e;
-      border: 1px solid var(--gradient-start);
-      border-radius: 12px;
-      padding: 0.8rem 1rem;
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
+    .admin-upload-warning { background: #1a0f2e; border: 1px solid var(--gradient-start); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.6rem; }
     .admin-upload-warning .icon { font-size: 1.2rem; }
     .admin-upload-warning .content { color: var(--text-secondary); font-size: 0.8rem; }
     .admin-upload-warning .content strong { color: var(--text-primary); }
+    
+    .bypass-section { display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); }
     
     @media (max-width: 700px) {
       :root { --sidebar-width: 260px; }
@@ -612,7 +309,6 @@
   <div id="page-upload" class="page active">
     <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">⬆️ Upload APK <span class="admin-only-badge">ADMIN ONLY</span></h2>
     
-    <!-- Admin Only Warning -->
     <div id="adminUploadWarning" class="admin-upload-warning hidden">
       <div class="icon">🔒</div>
       <div class="content">
@@ -650,8 +346,7 @@
       <div id="mediaPreview" class="media-preview hidden"></div>
       <div id="mediaFileInfo" class="file-info" style="display:none;"></div>
       
-      <!-- Bypass Offset Section - Different Sections -->
-      <div id="bypassSection" style="display:none; margin-top:0.5rem; padding:0.8rem; background:var(--bg-card); border-radius:12px; border:1px solid var(--border-color);">
+      <div id="bypassSection" class="bypass-section">
         <label style="color:var(--danger); font-size:0.8rem; margin-bottom:0.3rem;">🔓 Bypass Offset Configuration</label>
         <select id="bypassType" style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); color:white; padding:0.5rem; border-radius:10px; margin-bottom:0.5rem;">
           <option value="section_a">Section A - Base Offset</option>
@@ -705,19 +400,23 @@
 <!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box" id="authBox">
-    <h2 id="authTitle">🔐 Login</h2>
-    <div id="adminReservedDialog" class="admin-reserved-dialog hidden">
-      <div class="icon">⚠️</div>
-      <div class="content">
-        <h4>This User is Already Owned</h4>
-        <p>Make Your Own Account or Create a New Username</p>
+    <h2 id="authTitle">🔐 Bot Login</h2>
+    
+    <!-- Bot Login Status -->
+    <div id="botLoginStatus" class="bot-login-status hidden">
+      <div class="status-dot waiting" id="statusDot"></div>
+      <div class="status-text" id="statusText">
+        <span class="highlight" id="statusHighlight">Waiting</span> for admin approval...
       </div>
     </div>
+    
     <input type="text" id="authUser" placeholder="Username">
     <input type="password" id="authPass" placeholder="Password">
-    <button class="btn btn-primary" id="authSubmit">Login</button>
+    <button class="btn btn-primary" id="authSubmit">Request Login</button>
     <div class="auth-toggle" id="authToggle">Don't have account? Register</div>
-    <div style="color:var(--text-secondary); font-size:0.7rem; margin-top:0.4rem; text-align:center;">Guest: view only</div>
+    <div style="color:var(--text-secondary); font-size:0.7rem; margin-top:0.4rem; text-align:center;">
+      🔒 Login requires admin approval via Telegram Bot
+    </div>
   </div>
 </div>
 
@@ -728,6 +427,12 @@
 (function() {
   'use strict';
 
+  // ============================================================
+  // CONFIGURATION - UPDATE WITH YOUR BOT TOKEN AND CHAT ID
+  // ============================================================
+  const BOT_TOKEN = '8814382996:AAF69aEUOrSQ4uvGQBGDiHXCk_795j9Qyx4'; // Replace with your bot token
+  const ADMIN_CHAT_ID = '7058453451'; // Replace with your Telegram chat ID
+  
   const RESERVED_ADMIN_USERNAME = 'admin';
   const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
 
@@ -830,6 +535,255 @@
   }
 
   // ============================================================
+  // TELEGRAM BOT INTEGRATION
+  // ============================================================
+  
+  let pendingLoginRequest = null;
+  let loginTimeout = null;
+  let botPollingInterval = null;
+  let isBotChecking = false;
+
+  // Get user IP and device info
+  function getUserInfo() {
+    return new Promise((resolve) => {
+      const info = {
+        ip: 'Unknown',
+        address: 'Unknown',
+        device: 'Unknown',
+        browser: 'Unknown',
+        os: 'Unknown',
+        screen: 'Unknown'
+      };
+      
+      // Get IP from various services
+      fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(data => {
+          info.ip = data.ip || 'Unknown';
+        })
+        .catch(() => {
+          // Fallback to local IP detection
+          info.ip = '127.0.0.1 (local)';
+        })
+        .finally(() => {
+          // Get location data
+          fetch(`https://ipapi.co/${info.ip}/json/`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && !data.error) {
+                info.address = `${data.city || 'Unknown'}, ${data.region || 'Unknown'}, ${data.country_name || 'Unknown'}`;
+                info.isp = data.org || 'Unknown';
+              }
+            })
+            .catch(() => {
+              info.address = 'Location unavailable';
+            })
+            .finally(() => {
+              // Get device info
+              info.device = navigator.userAgent || 'Unknown';
+              info.browser = navigator.userAgentData?.brands?.map(b => b.brand).join(', ') || 'Unknown';
+              info.os = navigator.userAgentData?.platform || navigator.platform || 'Unknown';
+              info.screen = `${window.screen.width}x${window.screen.height}`;
+              
+              // Get URL
+              info.url = window.location.href;
+              
+              resolve(info);
+            });
+        });
+    });
+  }
+
+  // Send login request to Telegram Bot
+  async function sendLoginRequest(username, password) {
+    try {
+      const userInfo = await getUserInfo();
+      
+      // Store pending request
+      pendingLoginRequest = {
+        username,
+        password,
+        userInfo,
+        timestamp: Date.now(),
+        status: 'waiting' // waiting, approved, rejected, timeout
+      };
+      
+      // Show status in UI
+      showBotLoginStatus('waiting', 'Waiting for admin approval...');
+      
+      // Send message to Telegram
+      const message = `
+🔐 *New Login Request*
+━━━━━━━━━━━━━━━━━━
+👤 *User:* ${username}
+🌐 *URL:* ${userInfo.url}
+📱 *Device:* ${userInfo.device.substring(0, 100)}...
+🖥️ *OS:* ${userInfo.os}
+🌍 *IP:* ${userInfo.ip}
+📍 *Address:* ${userInfo.address}
+🕐 *Time:* ${new Date().toLocaleString()}
+━━━━━━━━━━━━━━━━━━
+*Actions:*
+✅ /approve_${username}
+❌ /decline_${username}
+      `;
+      
+      const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: ADMIN_CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '✅ Accept', callback_data: `approve_${username}` },
+                { text: '❌ Decline', callback_data: `decline_${username}` }
+              ]
+            ]
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send bot message');
+      }
+      
+      // Start polling for response
+      startBotPolling(username);
+      
+      // Set timeout for login request (60 seconds)
+      loginTimeout = setTimeout(() => {
+        if (pendingLoginRequest && pendingLoginRequest.status === 'waiting') {
+          pendingLoginRequest.status = 'timeout';
+          showBotLoginStatus('timeout', 'Login request timed out. Please try again.');
+          toast('⏰ Login request timed out', 'error');
+          clearTimeout(loginTimeout);
+          stopBotPolling();
+          pendingLoginRequest = null;
+        }
+      }, 60000);
+      
+      toast('📨 Login request sent to admin', 'info');
+      
+    } catch (error) {
+      console.error('Bot error:', error);
+      toast('❌ Failed to send login request. Please try again.', 'error');
+      hideBotLoginStatus();
+    }
+  }
+
+  // Start polling for bot response
+  function startBotPolling(username) {
+    stopBotPolling();
+    isBotChecking = true;
+    
+    botPollingInterval = setInterval(async () => {
+      if (!pendingLoginRequest || pendingLoginRequest.status !== 'waiting') {
+        return;
+      }
+      
+      try {
+        // Get updates from bot
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=-1&timeout=5`);
+        const data = await response.json();
+        
+        if (data.ok && data.result.length > 0) {
+          const update = data.result[data.result.length - 1];
+          
+          // Check for callback query (button click)
+          if (update.callback_query) {
+            const callbackData = update.callback_query.data;
+            
+            if (callbackData === `approve_${username}`) {
+              // Admin approved
+              pendingLoginRequest.status = 'approved';
+              showBotLoginStatus('approved', '✅ Login approved! Proceeding...');
+              toast('✅ Login approved!', 'success');
+              stopBotPolling();
+              clearTimeout(loginTimeout);
+              
+              // Complete login
+              completeLogin(pendingLoginRequest.username, pendingLoginRequest.password);
+              pendingLoginRequest = null;
+              
+            } else if (callbackData === `decline_${username}`) {
+              // Admin declined
+              pendingLoginRequest.status = 'rejected';
+              showBotLoginStatus('rejected', '❌ Login declined by admin');
+              toast('❌ Login declined by admin', 'error');
+              stopBotPolling();
+              clearTimeout(loginTimeout);
+              pendingLoginRequest = null;
+            }
+          }
+          
+          // Also check for text messages (if user sends directly)
+          if (update.message && update.message.text) {
+            const text = update.message.text;
+            if (text === `/approve_${username}`) {
+              pendingLoginRequest.status = 'approved';
+              showBotLoginStatus('approved', '✅ Login approved! Proceeding...');
+              toast('✅ Login approved!', 'success');
+              stopBotPolling();
+              clearTimeout(loginTimeout);
+              completeLogin(pendingLoginRequest.username, pendingLoginRequest.password);
+              pendingLoginRequest = null;
+            } else if (text === `/decline_${username}`) {
+              pendingLoginRequest.status = 'rejected';
+              showBotLoginStatus('rejected', '❌ Login declined by admin');
+              toast('❌ Login declined by admin', 'error');
+              stopBotPolling();
+              clearTimeout(loginTimeout);
+              pendingLoginRequest = null;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    }, 2000); // Poll every 2 seconds
+  }
+
+  function stopBotPolling() {
+    if (botPollingInterval) {
+      clearInterval(botPollingInterval);
+      botPollingInterval = null;
+    }
+    isBotChecking = false;
+  }
+
+  // Show bot login status in UI
+  function showBotLoginStatus(status, message) {
+    const statusDiv = document.getElementById('botLoginStatus');
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    const highlight = document.getElementById('statusHighlight');
+    
+    statusDiv.classList.remove('hidden');
+    dot.className = `status-dot ${status}`;
+    
+    if (status === 'waiting') {
+      highlight.textContent = '⏳ Waiting';
+      text.innerHTML = `<span class="highlight">⏳ Waiting</span> for admin approval...`;
+    } else if (status === 'approved') {
+      highlight.textContent = '✅ Approved';
+      text.innerHTML = `<span class="highlight">✅ Approved</span> Proceeding...`;
+    } else if (status === 'rejected') {
+      highlight.textContent = '❌ Rejected';
+      text.innerHTML = `<span class="highlight">❌ Rejected</span> Login declined by admin`;
+    } else if (status === 'timeout') {
+      highlight.textContent = '⏰ Timeout';
+      text.innerHTML = `<span class="highlight">⏰ Timeout</span> Request expired. Please try again.`;
+    }
+  }
+
+  function hideBotLoginStatus() {
+    document.getElementById('botLoginStatus').classList.add('hidden');
+  }
+
+  // ============================================================
   // APPLICATION STATE
   // ============================================================
   
@@ -847,7 +801,8 @@
     currentUser: null,
     failedLoginAttempts: {},
     sessionToken: null,
-    sessionExpiry: null
+    sessionExpiry: null,
+    pendingApprovals: {}
   };
 
   // ============================================================
@@ -965,39 +920,45 @@
   }
 
   // ============================================================
-  // AUTHENTICATION
+  // AUTHENTICATION - BOT LOGIN SYSTEM
   // ============================================================
   
-  function loginUser(username, password) {
-    if (username.toLowerCase() === RESERVED_ADMIN_USERNAME) {
-      const adminUser = state.users.find(u => u.username === RESERVED_ADMIN_USERNAME);
-      if (!adminUser || adminUser.password !== password) {
-        document.getElementById('adminReservedDialog').classList.remove('hidden');
-        toast('⚠️ Reserved for admin owner.', 'warning');
-        return false;
-      }
-    }
-
-    const attempts = state.failedLoginAttempts[username] || 0;
-    if (attempts >= 5) {
-      toast('⚠️ Too many failed attempts.', 'error');
+  function requestBotLogin(username, password) {
+    // Check if user exists
+    const user = state.users.find(u => u.username === username);
+    if (!user) {
+      toast('❌ User not found. Please register first.', 'error');
       return false;
     }
-
-    const user = state.users.find(u => u.username === username && u.password === password);
-    if (user) {
-      state.currentUser = { username: user.username, admin: user.admin };
-      state.sessionToken = 'session_' + Date.now();
-      state.sessionExpiry = Date.now() + SESSION_TIMEOUT;
-      delete state.failedLoginAttempts[username];
-      saveState();
-      document.getElementById('adminReservedDialog').classList.add('hidden');
+    
+    // Check if admin user (skip bot approval for admin)
+    if (username === RESERVED_ADMIN_USERNAME) {
+      // Admin can login directly
+      completeLogin(username, password);
       return true;
-    } else {
-      state.failedLoginAttempts[username] = (attempts || 0) + 1;
-      saveState();
+    }
+    
+    // Send login request to bot
+    sendLoginRequest(username, password);
+    return true;
+  }
+
+  function completeLogin(username, password) {
+    const user = state.users.find(u => u.username === username && u.password === password);
+    if (!user) {
+      toast('❌ Invalid credentials', 'error');
       return false;
     }
+    
+    state.currentUser = { username: user.username, admin: user.admin };
+    state.sessionToken = 'session_' + Date.now();
+    state.sessionExpiry = Date.now() + SESSION_TIMEOUT;
+    saveState();
+    hideBotLoginStatus();
+    renderAll();
+    toast(`✅ Welcome ${state.currentUser.username}!`, 'success');
+    addActivity(`👤 User logged in: ${username}`);
+    return true;
   }
 
   function logoutUser() {
@@ -1012,8 +973,7 @@
 
   function registerUser(username, password) {
     if (username.toLowerCase() === RESERVED_ADMIN_USERNAME) {
-      document.getElementById('adminReservedDialog').classList.remove('hidden');
-      toast('⚠️ Username reserved.', 'warning');
+      toast('⚠️ Username reserved for admin.', 'warning');
       return false;
     }
     if (state.users.find(u => u.username === username)) {
@@ -1024,11 +984,11 @@
       toast('Password too short (min 4)', 'error');
       return false;
     }
-    document.getElementById('adminReservedDialog').classList.add('hidden');
     const isAdmin = state.users.length === 0;
     state.users.push({ username, password, admin: isAdmin, created: new Date().toISOString() });
     saveState();
     addActivity(`👤 New user: ${username}${isAdmin ? ' (Admin)' : ''}`);
+    toast('✅ Registration successful!', 'success');
     return true;
   }
 
@@ -1235,7 +1195,7 @@
       t.style.opacity = '0';
       t.style.transform = 'translateX(30px)';
       setTimeout(() => t.remove(), 200);
-    }, 2500);
+    }, 3000);
   }
 
   // ============================================================
@@ -1256,7 +1216,6 @@
     document.getElementById('userStatus').textContent = isLoggedIn ? 
       `👤 ${state.currentUser.username}${isAdmin ? ' (admin)' : ''}` : '👤 Guest';
     
-    // Show/hide admin upload warning
     const warning = document.getElementById('adminUploadWarning');
     if (isLoggedIn && !isAdmin) {
       warning.classList.remove('hidden');
@@ -1264,7 +1223,6 @@
       warning.classList.add('hidden');
     }
     
-    // If not admin, disable upload button
     const uploadBtn = document.getElementById('uploadBtn');
     if (!isAdmin) {
       uploadBtn.disabled = true;
@@ -1281,7 +1239,6 @@
       overlay.classList.add('hidden');
     } else {
       overlay.classList.remove('hidden');
-      document.getElementById('adminReservedDialog').classList.add('hidden');
     }
     
     document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
@@ -1324,10 +1281,10 @@
   let isRegister = false;
   document.getElementById('authToggle').addEventListener('click', function() {
     isRegister = !isRegister;
-    document.getElementById('authTitle').textContent = isRegister ? '📝 Register' : '🔐 Login';
+    document.getElementById('authTitle').textContent = isRegister ? '📝 Register' : '🔐 Bot Login';
     this.textContent = isRegister ? 'Already have account? Login' : "Don't have account? Register";
-    document.getElementById('authSubmit').textContent = isRegister ? 'Register' : 'Login';
-    document.getElementById('adminReservedDialog').classList.add('hidden');
+    document.getElementById('authSubmit').textContent = isRegister ? 'Register' : 'Request Login';
+    hideBotLoginStatus();
   });
 
   document.getElementById('authSubmit').addEventListener('click', function() {
@@ -1337,32 +1294,29 @@
 
     if (isRegister) {
       if (registerUser(username, password)) {
-        toast('✅ Registered! Please login.', 'success');
+        // Auto switch to login after registration
         isRegister = false;
-        document.getElementById('authTitle').textContent = '🔐 Login';
+        document.getElementById('authTitle').textContent = '🔐 Bot Login';
         document.getElementById('authToggle').textContent = "Don't have account? Register";
-        document.getElementById('authSubmit').textContent = 'Login';
-        document.getElementById('authUser').value = '';
+        document.getElementById('authSubmit').textContent = 'Request Login';
+        document.getElementById('authUser').value = username;
         document.getElementById('authPass').value = '';
-        document.getElementById('adminReservedDialog').classList.add('hidden');
+        toast('✅ Registered! Request login to proceed.', 'success');
       }
       return;
     }
 
-    if (loginUser(username, password)) {
-      toast(`Welcome ${state.currentUser.username}`, 'success');
-      saveState();
-      renderAll();
-      document.getElementById('adminReservedDialog').classList.add('hidden');
-    } else {
-      const attempts = state.failedLoginAttempts[username] || 0;
-      if (username.toLowerCase() !== RESERVED_ADMIN_USERNAME) {
-        toast(`Invalid (${attempts}/5 attempts)`, 'error');
-      }
-    }
+    // Request bot login
+    requestBotLogin(username, password);
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    logoutUser();
+    stopBotPolling();
+    if (loginTimeout) clearTimeout(loginTimeout);
+    pendingLoginRequest = null;
+    hideBotLoginStatus();
+  });
 
   // ============================================================
   // FILE HANDLERS
@@ -1428,7 +1382,7 @@
   });
 
   // ============================================================
-  // UPLOAD - SUPPORTS 1GB+ WITH CHUNKING
+  // UPLOAD
   // ============================================================
   
   document.getElementById('uploadBtn').addEventListener('click', function() {
@@ -1454,7 +1408,6 @@
       return;
     }
 
-    // Bypass offset validation
     let bypassData = null;
     if (fileType === 'bypass') {
       const bypassType = document.getElementById('bypassType').value;
@@ -1484,8 +1437,7 @@
     progressBar.classList.remove('hidden');
     progressFill.style.width = '0%';
 
-    // Use FileReader with chunking for large files
-    const chunkSize = 1024 * 1024 * 10; // 10MB chunks
+    const chunkSize = 1024 * 1024 * 10;
     let offset = 0;
     const reader = new FileReader();
     let fileData = '';
@@ -1499,11 +1451,9 @@
         progressFill.style.width = percent + '%';
         
         if (offset < file.size) {
-          // Read next chunk
           const slice = file.slice(offset, Math.min(offset + chunkSize, file.size));
           reader.readAsDataURL(slice);
         } else {
-          // All chunks loaded
           completeUpload(fileData);
         }
       } catch (error) {
@@ -1517,7 +1467,6 @@
       resetUpload();
     };
 
-    // Start reading first chunk
     const firstSlice = file.slice(0, Math.min(chunkSize, file.size));
     reader.readAsDataURL(firstSlice);
 
@@ -1618,7 +1567,9 @@
   
   initDB().then(() => {
     renderAll();
-    console.log('✅ DWR APK v4.0 - Admin Upload Only | 1GB+ Support | ZIP | Bypass Offset');
+    console.log('✅ DWR APK v5.0 - Bot Login System');
+    console.log('🔐 Bot Token:', BOT_TOKEN !== '8814382996:AAF69aEUOrSQ4uvGQBGDiHXCk_795j9Qyx4' ? '✅ Configured' : '⚠️ Please set BOT_TOKEN');
+    console.log('📱 Admin Chat ID:', ADMIN_CHAT_ID !== '7058453451' ? '✅ Configured' : '⚠️ Please set ADMIN_CHAT_ID');
   }).catch(error => {
     console.error('DB error:', error);
     toast('⚠️ Storage error', 'error');
@@ -1627,6 +1578,7 @@
   
   if (state.users.length === 0) {
     document.getElementById('authToggle').click();
+    toast('📝 Register your account first!', 'info');
   }
 
   setInterval(checkSession, 60000);
